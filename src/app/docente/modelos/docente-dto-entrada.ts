@@ -6,4 +6,5 @@ export interface DocenteDTOEntrada {
   telefono?: string;
   celular?: string;
   idGrupo: number;
+  activo: boolean;
 }

@@ -1,0 +1,438 @@
+<div class="container py-4">
+
+  <!-- Encabezado -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-0">Proyectos</h2>
+      <p class="text-muted mb-0" *ngIf="director">
+        Director: <span class="fw-semibold">{{ director.nombres }} {{ director.apellidos }}</span>
+      </p>
+    </div>
+    <div class="d-flex gap-2">
+      <button
+        class="btn btn-success"
+        [routerLink]="['/proyectos/registrar']"
+        [queryParams]="{ idDirector: idDocente }"
+      >
+        <i class="bi bi-plus-lg me-1"></i>Registrar proyecto
+      </button>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="alert alert-danger" role="alert">
+    {{ error }}
+  </div>
+
+  <!-- Cargando -->
+  <div *ngIf="cargando && !error" class="text-center py-5 text-muted">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2 mb-0">Cargando proyectos...</p>
+  </div>
+
+  <!-- Filtros -->
+  <div *ngIf="!cargando && !error" class="card mb-4 shadow-sm">
+    <div class="card-header bg-light fw-semibold">Filtrar proyectos</div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label for="filtroTitulo" class="form-label">Título</label>
+          <input
+            id="filtroTitulo"
+            type="text"
+            class="form-control"
+            placeholder="Buscar por título..."
+            [(ngModel)]="filtroTitulo"
+            (ngModelChange)="paginaActual = 1"
+          >
+        </div>
+        <div class="col-md-4">
+          <label for="filtroTipo" class="form-label">Tipo</label>
+          <select id="filtroTipo" class="form-select" [(ngModel)]="filtroTipo" (ngModelChange)="paginaActual = 1">
+            <option value="">Todos</option>
+            <option *ngFor="let tipo of tiposProyecto" [value]="tipo">{{ tipo }}</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="filtroLinea" class="form-label">Línea de investigación</label>
+          <select id="filtroLinea" class="form-select" [(ngModel)]="filtroLinea" (ngModelChange)="paginaActual = 1">
+            <option value="">Todas</option>
+            <option *ngFor="let linea of lineasInvestigacion" [value]="linea.nombre">{{ linea.nombre }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-3 text-end">
+        <button class="btn btn-secondary" (click)="limpiarFiltros()" [disabled]="!hayFiltrosActivos()">
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div *ngIf="!cargando && !error" class="card shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th scope="col" style="min-width: 200px;">Título</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Línea de investigación</th>
+            <th scope="col">Estado</th>
+            <th scope="col" class="text-center">Opciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let proyecto of proyectosPaginados">
+            <td class="fw-semibold text-truncate" style="max-width: 200px;" [title]="proyecto.titulo">{{ proyecto.titulo }}</td>
+            <td>{{ proyecto.tipoProyecto }}</td>
+            <td>
+              <span *ngIf="proyecto.lineaInvestigacion">{{ proyecto.lineaInvestigacion.nombre }}</span>
+              <span *ngIf="!proyecto.lineaInvestigacion" class="text-muted">—</span>
+            </td>
+            <td>
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  role="switch"
+                  style="cursor: pointer;"
+                  [id]="'estado-' + proyecto.id"
+                  [checked]="proyecto.activado"
+                  (change)="cambiarEstado(proyecto, $any($event.target).checked)"
+                >
+                <label class="form-check-label" [for]="'estado-' + proyecto.id">
+                  <span class="badge"
+                    [class.text-bg-success]="proyecto.activado"
+                    [class.text-bg-secondary]="!proyecto.activado">
+                    {{ proyecto.activado ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </label>
+              </div>
+            </td>
+            <td class="text-center">
+              <button
+                type="button"
+                class="btn btn-sm text-secondary me-1"
+                title="Ver detalle"
+                (click)="abrirModalVer(proyecto)"
+              >
+                <i class="bi bi-eye"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm text-primary me-1"
+                title="Editar proyecto"
+                (click)="abrirModalEditar(proyecto)"
+              >
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm text-danger"
+                title="Eliminar proyecto"
+                (click)="eliminarProyecto(proyecto)"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="proyectos.length === 0">
+            <td colspan="5" class="text-center text-muted py-4">
+              Este director no tiene proyectos registrados.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Paginación -->
+    <div class="card-footer d-flex justify-content-between align-items-center">
+      <span class="text-muted small">
+        Mostrando {{ proyectosPaginados.length }} de {{ proyectosFiltrados.length }} proyecto(s).
+      </span>
+      <nav *ngIf="totalPaginas > 1">
+        <ul class="pagination pagination-sm mb-0">
+          <li class="page-item" [class.disabled]="paginaActual === 1">
+            <button class="page-link" (click)="cambiarPagina(paginaActual - 1)">&#8249;</button>
+          </li>
+          <li
+            *ngFor="let p of paginas"
+            class="page-item"
+            [class.active]="p === paginaActual"
+          >
+            <button class="page-link" (click)="cambiarPagina(p)">{{ p }}</button>
+          </li>
+          <li class="page-item" [class.disabled]="paginaActual === totalPaginas">
+            <button class="page-link" (click)="cambiarPagina(paginaActual + 1)">&#8250;</button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal: actualizar proyecto -->
+<div
+  class="modal fade"
+  [class.show]="modalAbierto"
+  [style.display]="modalAbierto ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  [attr.aria-hidden]="!modalAbierto"
+>
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <form [formGroup]="formEditar" (ngSubmit)="guardarCambios()" novalidate>
+
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Actualizar proyecto</h5>
+          <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarModal()"></button>
+        </div>
+
+        <div class="modal-body" style="max-height: 65vh; overflow-y: auto;">
+          <div *ngIf="errorModal" class="alert alert-danger" role="alert">
+            {{ errorModal }}
+          </div>
+
+          <div class="row g-3">
+
+            <!-- Título -->
+            <div class="col-12">
+              <label for="m-titulo" class="form-label">Título <span class="text-danger">*</span></label>
+              <input
+                id="m-titulo"
+                type="text"
+                class="form-control"
+                formControlName="titulo"
+                maxlength="100"
+                [class.is-invalid]="fm['titulo'].invalid && fm['titulo'].touched"
+              >
+              <div class="invalid-feedback" *ngIf="fm['titulo'].touched">
+                <span *ngIf="fm['titulo'].errors?.['required']">El título del proyecto es requerido.</span>
+                <span *ngIf="fm['titulo'].errors?.['minlength']">El título debe tener al menos 5 caracteres.</span>
+                <span *ngIf="fm['titulo'].errors?.['maxlength']">El título no puede superar los 100 caracteres.</span>
+              </div>
+              <div class="form-text text-end" *ngIf="fm['titulo'].value">
+                {{ fm['titulo'].value.length }}/100
+              </div>
+            </div>
+
+            <!-- Resumen -->
+            <div class="col-12">
+              <label for="m-resumen" class="form-label">Resumen <span class="text-danger">*</span></label>
+              <textarea
+                id="m-resumen"
+                class="form-control"
+                rows="3"
+                formControlName="resumen"
+                maxlength="500"
+                [class.is-invalid]="fm['resumen'].invalid && fm['resumen'].touched"
+              ></textarea>
+              <div class="invalid-feedback" *ngIf="fm['resumen'].touched">
+                <span *ngIf="fm['resumen'].errors?.['required']">El resumen es requerido.</span>
+                <span *ngIf="fm['resumen'].errors?.['minlength']">El resumen debe tener al menos 10 caracteres.</span>
+                <span *ngIf="fm['resumen'].errors?.['maxlength']">El resumen no puede superar los 500 caracteres.</span>
+              </div>
+              <div class="form-text text-end" *ngIf="fm['resumen'].value">
+                {{ fm['resumen'].value.length }}/500
+              </div>
+            </div>
+
+            <!-- Objetivos -->
+            <div class="col-12">
+              <label for="m-objetivos" class="form-label">Objetivos <span class="text-danger">*</span></label>
+              <textarea
+                id="m-objetivos"
+                class="form-control"
+                rows="3"
+                formControlName="objetivos"
+                maxlength="500"
+                [class.is-invalid]="fm['objetivos'].invalid && fm['objetivos'].touched"
+              ></textarea>
+              <div class="invalid-feedback" *ngIf="fm['objetivos'].touched">
+                <span *ngIf="fm['objetivos'].errors?.['required']">Los objetivos son requeridos.</span>
+                <span *ngIf="fm['objetivos'].errors?.['minlength']">Los objetivos deben tener al menos 10 caracteres.</span>
+                <span *ngIf="fm['objetivos'].errors?.['maxlength']">Los objetivos no pueden superar los 500 caracteres.</span>
+              </div>
+              <div class="form-text text-end" *ngIf="fm['objetivos'].value">
+                {{ fm['objetivos'].value.length }}/500
+              </div>
+            </div>
+
+            <!-- Tipo de proyecto -->
+            <div class="col-md-6">
+              <label for="m-tipoProyecto" class="form-label">Tipo de proyecto <span class="text-danger">*</span></label>
+              <select
+                id="m-tipoProyecto"
+                class="form-select"
+                formControlName="tipoProyecto"
+                [class.is-invalid]="fm['tipoProyecto'].invalid && fm['tipoProyecto'].touched"
+              >
+                <option value="" disabled>Seleccione un tipo...</option>
+                <option *ngFor="let tipo of tiposProyecto" [value]="tipo">{{ tipo }}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="fm['tipoProyecto'].touched">
+                <span *ngIf="fm['tipoProyecto'].errors?.['required']">El tipo de proyecto es requerido.</span>
+              </div>
+            </div>
+
+            <!-- Línea de investigación -->
+            <div class="col-md-6">
+              <label for="m-idLineaInvestigacion" class="form-label">Línea de investigación <span class="text-danger">*</span></label>
+              <select
+                id="m-idLineaInvestigacion"
+                class="form-select"
+                formControlName="idLineaInvestigacion"
+                [class.is-invalid]="fm['idLineaInvestigacion'].invalid && fm['idLineaInvestigacion'].touched"
+              >
+                <option [ngValue]="null" disabled>Seleccione una línea...</option>
+                <option *ngFor="let linea of lineasInvestigacion" [ngValue]="linea.id">
+                  {{ linea.nombre }}
+                </option>
+              </select>
+              <div class="invalid-feedback" *ngIf="fm['idLineaInvestigacion'].touched">
+                <span *ngIf="fm['idLineaInvestigacion'].errors?.['required']">La línea de investigación es requerida.</span>
+              </div>
+            </div>
+
+            <!-- Director (solo lectura) -->
+            <div class="col-md-6">
+              <label class="form-label">Director</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-person-lock"></i></span>
+                <input
+                  type="text"
+                  class="form-control bg-light"
+                  [value]="director ? director.nombres + ' ' + director.apellidos : ''"
+                  readonly
+                >
+              </div>
+              <div class="form-text text-muted">El director no puede modificarse.</div>
+            </div>
+
+            <!-- Activado -->
+            <div class="col-md-6 d-flex align-items-end">
+              <div class="form-check form-switch pb-1">
+                <input
+                  id="m-activado"
+                  type="checkbox"
+                  class="form-check-input"
+                  formControlName="activado"
+                  role="switch"
+                >
+                <label class="form-check-label" for="m-activado">Proyecto activo</label>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" (click)="cerrarModal()" [disabled]="guardando">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="guardando">
+            <span
+              *ngIf="guardando"
+              class="spinner-border spinner-border-sm me-1"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            Guardar cambios
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop modal editar -->
+<div class="modal-backdrop fade show" *ngIf="modalAbierto"></div>
+
+<!-- Modal: ver detalle del proyecto -->
+<div
+  class="modal fade"
+  [class.show]="modalVerAbierto"
+  [style.display]="modalVerAbierto ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  [attr.aria-hidden]="!modalVerAbierto"
+>
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+    <div class="modal-content" *ngIf="proyectoVer">
+
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-eye me-2"></i>Detalle del proyecto</h5>
+        <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarModalVer()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+
+          <div class="col-12">
+            <p class="text-muted small mb-1">Título</p>
+            <div class="fw-semibold" style="text-align: justify; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">{{ proyectoVer.titulo }}</div>
+          </div>
+
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Tipo de proyecto</p>
+            <span class="badge text-bg-primary fs-6">{{ proyectoVer.tipoProyecto }}</span>
+          </div>
+
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Estado</p>
+            <span
+              class="badge fs-6"
+              [class.text-bg-success]="proyectoVer.activado"
+              [class.text-bg-secondary]="!proyectoVer.activado"
+            >
+              {{ proyectoVer.activado ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Línea de investigación</p>
+            <span *ngIf="proyectoVer.lineaInvestigacion" class="badge text-bg-info fs-6">
+              {{ proyectoVer.lineaInvestigacion.nombre }}
+            </span>
+            <span *ngIf="!proyectoVer.lineaInvestigacion" class="text-muted">—</span>
+          </div>
+
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Director</p>
+            <p class="fw-semibold mb-0" *ngIf="proyectoVer.director">
+              {{ proyectoVer.director.nombres }} {{ proyectoVer.director.apellidos }}
+            </p>
+            <span *ngIf="!proyectoVer.director" class="text-muted">—</span>
+          </div>
+
+          <div class="col-12">
+            <p class="text-muted small mb-1">Resumen</p>
+            <div class="border rounded p-2 bg-light" style="text-align: justify; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">{{ proyectoVer.resumen }}</div>
+          </div>
+
+          <div class="col-12">
+            <p class="text-muted small mb-1">Objetivos</p>
+            <div class="border rounded p-2 bg-light" style="text-align: justify; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">{{ proyectoVer.objetivos }}</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="cerrarModalVer()">
+          Cerrar
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop modal ver -->
+<div class="modal-backdrop fade show" *ngIf="modalVerAbierto"></div>

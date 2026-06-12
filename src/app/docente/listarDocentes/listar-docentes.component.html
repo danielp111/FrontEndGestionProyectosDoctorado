@@ -1,15 +1,11 @@
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0">Docentes</h2>
-    <button class="btn btn-outline-primary" (click)="cargarDocentes()" [disabled]="cargando">
-      <span
-        *ngIf="cargando"
-        class="spinner-border spinner-border-sm me-1"
-        role="status"
-        aria-hidden="true"
-      ></span>
-      Recargar
-    </button>
+    <div class="d-flex gap-2">
+      <a class="btn btn-primary" routerLink="/docentes/registrar">
+        <i class="bi bi-person-plus me-1"></i>Registrar docente
+      </a>
+    </div>
   </div>
 
   <!-- Filtros -->
@@ -24,7 +20,7 @@
             type="text"
             class="form-control"
             placeholder="Ej. Juan"
-            [(ngModel)]="filtro.nombres"
+            [(ngModel)]="filtro.nombres" (ngModelChange)="paginaActual = 1"
           >
         </div>
         <div class="col-md-4">
@@ -34,7 +30,7 @@
             type="text"
             class="form-control"
             placeholder="Ej. Pérez"
-            [(ngModel)]="filtro.apellidos"
+            [(ngModel)]="filtro.apellidos" (ngModelChange)="paginaActual = 1"
           >
         </div>
         <div class="col-md-4">
@@ -44,7 +40,7 @@
             type="text"
             class="form-control"
             placeholder="Nombre del grupo"
-            [(ngModel)]="filtro.nombreGrupo"
+            [(ngModel)]="filtro.nombreGrupo" (ngModelChange)="paginaActual = 1"
           >
         </div>
       </div>
@@ -84,27 +80,21 @@
             <th scope="col">Grupo</th>
             <th scope="col">Correo</th>
             <th scope="col">Oficina</th>
-            <th scope="col">Teléfono</th>
-            <th scope="col">Celular</th>
             <th scope="col">Estado</th>
             <th scope="col" class="text-center">Opciones</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let docente of docentesFiltrados">
+          <tr *ngFor="let docente of docentesPaginados">
             <td>{{ docente.id }}</td>
             <td>{{ docente.nombres }}</td>
             <td>{{ docente.apellidos }}</td>
             <td>
-              <span *ngIf="docente.grupo" class="badge text-bg-info">
-                {{ docente.grupo.nombre }}
-              </span>
+              <span *ngIf="docente.grupo">{{ docente.grupo.nombre }}</span>
               <span *ngIf="!docente.grupo" class="text-muted">—</span>
             </td>
             <td>{{ docente.correo }}</td>
             <td>{{ docente.oficina }}</td>
-            <td>{{ docente.telefono }}</td>
-            <td>{{ docente.celular }}</td>
             <td>
               <div class="form-check form-switch">
                 <input
@@ -125,25 +115,60 @@
             <td class="text-center">
               <button
                 type="button"
-                class="btn btn-sm btn-outline-primary"
+                class="btn btn-sm text-secondary me-1"
+                title="Ver detalle"
+                (click)="abrirModalVer(docente)"
+              >
+                <i class="bi bi-eye"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm text-primary"
                 title="Editar docente"
                 (click)="abrirModalEditar(docente)"
               >
                 <i class="bi bi-pencil"></i>
               </button>
+              <button
+                type="button"
+                class="btn btn-sm text-danger"
+                title="Eliminar docente"
+                (click)="confirmarEliminar(docente)"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
             </td>
           </tr>
 
           <tr *ngIf="docentesFiltrados.length === 0">
-            <td colspan="10" class="text-center text-muted py-4">
+            <td colspan="8" class="text-center text-muted py-4">
               No se encontraron docentes que coincidan con el filtro.
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div class="card-footer text-muted small">
-      Mostrando {{ docentesFiltrados.length }} de {{ docentes.length }} docente(s).
+    <div class="card-footer d-flex justify-content-between align-items-center">
+      <span class="text-muted small">
+        Mostrando {{ docentesPaginados.length }} de {{ docentesFiltrados.length }} docente(s).
+      </span>
+      <nav *ngIf="totalPaginas > 1">
+        <ul class="pagination pagination-sm mb-0">
+          <li class="page-item" [class.disabled]="paginaActual === 1">
+            <button class="page-link" (click)="cambiarPagina(paginaActual - 1)">&#8249;</button>
+          </li>
+          <li
+            *ngFor="let p of paginas"
+            class="page-item"
+            [class.active]="p === paginaActual"
+          >
+            <button class="page-link" (click)="cambiarPagina(p)">{{ p }}</button>
+          </li>
+          <li class="page-item" [class.disabled]="paginaActual === totalPaginas">
+            <button class="page-link" (click)="cambiarPagina(paginaActual + 1)">&#8250;</button>
+          </li>
+        </ul>
+      </nav>
     </div>
   </div>
 </div>
@@ -248,6 +273,23 @@
               <input id="m-celular" type="text" class="form-control" formControlName="celular">
             </div>
 
+            <!-- Estado -->
+            <div class="col-md-6 d-flex align-items-end">
+              <div class="form-check form-switch mb-1">
+                <input
+                  id="m-activo"
+                  class="form-check-input"
+                  type="checkbox"
+                  role="switch"
+                  formControlName="activo"
+                  style="cursor: pointer;"
+                >
+                <label class="form-check-label" for="m-activo">
+                  {{ fm['activo'].value ? 'Activo' : 'Inactivo' }}
+                </label>
+              </div>
+            </div>
+
             <!-- Grupo -->
             <div class="col-md-6">
               <label for="m-idGrupo" class="form-label">Grupo <span class="text-danger">*</span></label>
@@ -288,5 +330,85 @@
   </div>
 </div>
 
-<!-- Backdrop del modal -->
+<!-- Backdrop del modal de edición -->
 <div class="modal-backdrop fade show" *ngIf="modalAbierto"></div>
+
+<!-- Modal: ver detalle del docente -->
+<div
+  class="modal fade"
+  [class.show]="modalVerAbierto"
+  [style.display]="modalVerAbierto ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  [attr.aria-hidden]="!modalVerAbierto"
+>
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content" *ngIf="docenteVer">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-person-circle me-2"></i>Detalle del docente
+        </h5>
+        <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarModalVer()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Nombres</p>
+            <p class="fw-semibold mb-0">{{ docenteVer.nombres }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Apellidos</p>
+            <p class="fw-semibold mb-0">{{ docenteVer.apellidos }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Correo</p>
+            <p class="fw-semibold mb-0">{{ docenteVer.correo }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Oficina</p>
+            <p class="fw-semibold mb-0">{{ docenteVer.oficina }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Teléfono</p>
+            <p class="fw-semibold mb-0">{{ docenteVer.telefono || '—' }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Celular</p>
+            <p class="fw-semibold mb-0">{{ docenteVer.celular || '—' }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Grupo</p>
+            <span *ngIf="docenteVer.grupo" class="fw-semibold mb-0">
+              {{ docenteVer.grupo.nombre }}
+            </span>
+            <span *ngIf="!docenteVer.grupo" class="text-muted">—</span>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Estado</p>
+            <span
+              class="badge fs-6"
+              [class.text-bg-success]="docenteVer.activo"
+              [class.text-bg-secondary]="!docenteVer.activo"
+            >
+              {{ docenteVer.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+          <div class="col-12" *ngIf="docenteVer.grupo?.descripcion">
+            <p class="text-muted small mb-1">Descripción del grupo</p>
+            <p class="mb-0">{{ docenteVer.grupo!.descripcion }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="cerrarModalVer()">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop del modal de detalle -->
+<div class="modal-backdrop fade show" *ngIf="modalVerAbierto"></div>

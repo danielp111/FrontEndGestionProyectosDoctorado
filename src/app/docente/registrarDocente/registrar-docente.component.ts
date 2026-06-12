@@ -6,6 +6,7 @@ import { DocenteDTOEntrada } from '../modelos/docente-dto-entrada';
 import { GrupoDTOSalida } from '../modelos/grupo-dto-salida';
 import { DocenteService } from '../servicios/docente.service';
 import { GrupoService } from '../servicios/grupo.service';
+import { extraerMensajeError } from '../../shared/utils/error.util';
 
 @Component({
   selector: 'app-registrar-docente',
@@ -77,8 +78,8 @@ export class RegistrarDocenteComponent implements OnInit {
       },
       error: (err) => {
         this.enviando = false;
-        this.mensajeError =
-          err?.error?.message ?? 'No se pudo registrar el docente. Inténtalo de nuevo.';
+
+        this.mensajeError = extraerMensajeError(err, 'No se pudo registrar el docente. Inténtalo de nuevo.');
       }
     });
   }

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { FormsModule, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 import { DocenteDTOSalida } from '../modelos/docente-dto-salida';
 import { DocenteDTOEntrada } from '../modelos/docente-dto-entrada';
@@ -8,11 +10,12 @@ import { DocenteFiltroDTO } from '../modelos/docente-filtro-dto';
 import { GrupoDTOSalida } from '../modelos/grupo-dto-salida';
 import { DocenteService } from '../servicios/docente.service';
 import { GrupoService } from '../servicios/grupo.service';
+import { extraerMensajeError } from '../../shared/utils/error.util';
 
 @Component({
   selector: 'app-listar-docentes',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule],
   templateUrl: './listar-docentes.component.html',
   styleUrls: ['./listar-docentes.component.css']
 })
@@ -22,6 +25,9 @@ export class ListarDocentesComponent implements OnInit {
   filtro: DocenteFiltroDTO = {};
   cargando = false;
   error: string | null = null;
+
+  paginaActual = 1;
+  readonly elementosPorPagina = 5;
 
   // Estado del modal de edición.
   form: FormGroup;
@@ -46,7 +52,8 @@ export class ListarDocentesComponent implements OnInit {
       correo: ['', [Validators.required, Validators.email]],
       telefono: [''],
       celular: [''],
-      idGrupo: [null, [Validators.required]]
+      idGrupo: [null, [Validators.required]],
+      activo: [true]
     });
   }
 
@@ -100,8 +107,26 @@ export class ListarDocentesComponent implements OnInit {
     });
   }
 
+  get docentesPaginados(): DocenteDTOSalida[] {
+    const inicio = (this.paginaActual - 1) * this.elementosPorPagina;
+    return this.docentesFiltrados.slice(inicio, inicio + this.elementosPorPagina);
+  }
+
+  get totalPaginas(): number {
+    return Math.ceil(this.docentesFiltrados.length / this.elementosPorPagina);
+  }
+
+  get paginas(): number[] {
+    return Array.from({ length: this.totalPaginas }, (_, i) => i + 1);
+  }
+
+  cambiarPagina(pagina: number): void {
+    if (pagina >= 1 && pagina <= this.totalPaginas) this.paginaActual = pagina;
+  }
+
   limpiarFiltros(): void {
     this.filtro = {};
+    this.paginaActual = 1;
   }
 
   hayFiltrosActivos(): boolean {
@@ -128,7 +153,8 @@ export class ListarDocentesComponent implements OnInit {
       correo: docente.correo,
       telefono: docente.telefono,
       celular: docente.celular,
-      idGrupo: docente.grupo?.id ?? null
+      idGrupo: docente.grupo?.id ?? null,
+      activo: docente.activo
     });
     this.modalAbierto = true;
   }
@@ -137,6 +163,16 @@ export class ListarDocentesComponent implements OnInit {
     this.modalAbierto = false;
     this.docenteEditandoId = null;
     this.errorModal = null;
+  }
+
+  abrirModalVer(docente: DocenteDTOSalida): void {
+    this.docenteVer = docente;
+    this.modalVerAbierto = true;
+  }
+
+  cerrarModalVer(): void {
+    this.modalVerAbierto = false;
+    this.docenteVer = null;
   }
 
   guardarCambios(): void {
@@ -164,8 +200,39 @@ export class ListarDocentesComponent implements OnInit {
       },
       error: (err) => {
         this.guardando = false;
-        this.errorModal =
-          err?.error?.message ?? 'No se pudo actualizar el docente. Inténtalo de nuevo.';
+        console.log(err);
+        this.errorModal = extraerMensajeError(err, 'No se pudo actualizar el docente. Inténtalo de nuevo.');
+      }
+    });
+  }
+
+  confirmarEliminar(docente: DocenteDTOSalida): void {
+    Swal.fire({
+      title: '¿Eliminar docente?',
+      text: `Se eliminará a ${docente.nombres} ${docente.apellidos}. Esta acción no se puede deshacer.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.docenteService.eliminar(docente.id).subscribe({
+          next: () => {
+            this.docentes = this.docentes.filter(d => d.id !== docente.id);
+            Swal.fire({
+              title: 'Eliminado',
+              text: 'El docente fue eliminado correctamente.',
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            });
+          },
+          error: (err) => {
+            Swal.fire('Error', extraerMensajeError(err, 'No se pudo eliminar el docente.'), 'error');
+          }
+        });
       }
     });
   }

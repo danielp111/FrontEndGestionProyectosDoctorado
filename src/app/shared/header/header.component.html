@@ -1,0 +1,21 @@
+<header class="site-header">
+
+  <div class="header-spacer"></div>
+
+  <div class="logo">
+    <a routerLink="/" aria-label="Inicio — Doctorado en Ciencias de la Computación">
+      <img src="assets/img/blue.png" alt="Logo Universidad del Cauca" />
+    </a>
+    <span class="h-line" aria-hidden="true"></span>
+    <div class="logo-title">
+      @for (line of titleLines(); track line) {
+        <span class="logo-title__line">{{ line }}</span>
+      }
+    </div>
+  </div>
+
+  <div class="header-menu">
+    <app-menu />
+  </div>
+
+</header>

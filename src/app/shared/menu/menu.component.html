@@ -1,0 +1,68 @@
+<nav class="main-menu" aria-label="Menú principal">
+
+  <button
+    type="button"
+    class="menu-toggle"
+    [attr.aria-expanded]="mobileOpen()"
+    aria-controls="main-menu-list"
+    (click)="toggleMobile()">
+    <span class="menu-toggle__bar"></span>
+    <span class="menu-toggle__bar"></span>
+    <span class="menu-toggle__bar"></span>
+    <span class="visually-hidden">Abrir menú</span>
+  </button>
+
+  <ul id="main-menu-list" class="menu-list" [class.menu-list--open]="mobileOpen()">
+
+    <!-- Opción visible para todos -->
+    <li class="menu-item">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+         (click)="cerrarMovil()">
+        Ver todos los proyectos
+      </a>
+    </li>
+
+    @if (authService.isLoggedIn()) {
+
+      <!-- Solo DOCENTE -->
+      @if (esDocente && idDocente) {
+        <li class="menu-item">
+          <a [routerLink]="['/docentes', idDocente, 'proyectos']" routerLinkActive="active"
+             (click)="cerrarMovil()">
+            Gestionar mis proyectos
+          </a>
+        </li>
+        <li class="menu-item">
+          <a [routerLink]="['/docentes/actualizar', idDocente]" routerLinkActive="active"
+             (click)="cerrarMovil()">
+            Editar mis datos
+          </a>
+        </li>
+      }
+
+      <!-- Solo ADMINISTRADOR -->
+      @if (esAdmin) {
+        <li class="menu-item">
+          <a routerLink="/docentes" routerLinkActive="active"
+             (click)="cerrarMovil()">
+            Gestionar docentes
+          </a>
+        </li>
+      }
+
+      <!-- Cerrar sesión -->
+      <li class="menu-item">
+        <a (click)="cerrarSesion()" class="btn-sesion" style="cursor:pointer;">Cerrar sesión</a>
+      </li>
+
+    } @else {
+
+      <!-- Usuario público -->
+      <li class="menu-item">
+        <a routerLink="/login" class="btn-sesion">Iniciar sesión</a>
+      </li>
+
+    }
+
+  </ul>
+</nav>

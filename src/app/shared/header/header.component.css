@@ -1,0 +1,107 @@
+/* ---------- Barra de idioma ---------- */
+.language-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 1.5rem;
+  font-size: 0.875rem;
+  background: #f6f8fb;
+}
+
+.lang-link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #1d3557;
+  font: inherit;
+}
+
+.lang-link--active {
+  font-weight: 700;
+}
+
+.lang-sep {
+  color: #9aa7b8;
+}
+
+/* ---------- Header principal ---------- */
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #fff;
+  border-bottom: 1px solid #e3e8ef;
+  position: relative;
+}
+
+.header-spacer {
+  flex: 1;
+}
+
+/* ---------- Logo + título ---------- */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo img {
+  height: 112px;
+  width: auto;
+}
+
+/* Línea vertical separadora (equivalente a .h-line del tema) */
+.h-line {
+  display: inline-block;
+  width: 1px;
+  height: 48px;
+  background: #C5161E;
+}
+
+.logo-title {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  font-weight: 700;
+  color: #1d3557;
+  letter-spacing: 0.02em;
+}
+
+.logo-title__line {
+  font-size: 1rem;
+}
+
+/* ---------- Menú ---------- */
+.header-menu {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.nav-search {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  background: url('/assets/img/search.svg') center / contain no-repeat;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .site-header {
+    flex-wrap: wrap;
+  }
+
+  .logo img {
+    height: 44px;
+  }
+
+  .logo-title__line {
+    font-size: 0.85rem;
+  }
+}

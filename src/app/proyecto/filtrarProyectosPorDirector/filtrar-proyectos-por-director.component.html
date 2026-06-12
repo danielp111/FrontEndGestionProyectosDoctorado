@@ -1,0 +1,391 @@
+<div class="container py-4">
+
+  <!-- Encabezado -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Filtrar proyectos</h2>
+  </div>
+
+  <!-- Filtros -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-light fw-semibold">Criterios de búsqueda</div>
+    <div class="card-body">
+      <div class="row g-3">
+
+        <!-- Título -->
+        <div class="col-md-6">
+          <label for="fTitulo" class="form-label">Título</label>
+          <input
+            id="fTitulo"
+            type="text"
+            class="form-control"
+            placeholder="Buscar por título..."
+            [(ngModel)]="filtro.titulo"
+          >
+        </div>
+
+        <!-- Tipo -->
+        <div class="col-md-6">
+          <label for="fTipo" class="form-label">Tipo</label>
+          <select id="fTipo" class="form-select" [(ngModel)]="filtro.tipo">
+            <option value="">Todos</option>
+            <option *ngFor="let tipo of tiposProyecto" [value]="tipo">{{ tipo }}</option>
+          </select>
+        </div>
+
+        <!-- Resumen -->
+        <div class="col-md-6">
+          <label for="fResumen" class="form-label">Resumen</label>
+          <input
+            id="fResumen"
+            type="text"
+            class="form-control"
+            placeholder="Buscar en el resumen..."
+            [(ngModel)]="filtro.resumen"
+          >
+        </div>
+
+        <!-- Objetivos -->
+        <div class="col-md-6">
+          <label for="fObjetivos" class="form-label">Objetivos</label>
+          <input
+            id="fObjetivos"
+            type="text"
+            class="form-control"
+            placeholder="Buscar en los objetivos..."
+            [(ngModel)]="filtro.objetivos"
+          >
+        </div>
+
+        <!-- Director -->
+        <div class="col-md-4">
+          <label for="fDirector" class="form-label">Director</label>
+          <select id="fDirector" class="form-select" [(ngModel)]="filtro.idDirector">
+            <option [ngValue]="null">Todos</option>
+            <option *ngFor="let docente of docentes" [ngValue]="docente.id">
+              {{ docente.nombres }} {{ docente.apellidos }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Línea de investigación -->
+        <div class="col-md-4">
+          <label for="fLinea" class="form-label">Línea de investigación</label>
+          <select id="fLinea" class="form-select" [(ngModel)]="filtro.idLineaInvestigacion">
+            <option [ngValue]="null">Todas</option>
+            <option *ngFor="let linea of lineasInvestigacion" [ngValue]="linea.id">
+              {{ linea.nombre }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Estado -->
+        <div class="col-md-4">
+          <label for="fActivado" class="form-label">Estado proyecto</label>
+          <select id="fActivado" class="form-select" [(ngModel)]="filtroActivado">
+            <option value="">Todos</option>
+            <option value="true">Activo</option>
+            <option value="false">Inactivo</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <button class="btn btn-outline-secondary" (click)="limpiar()">
+          <i class="bi bi-x-circle me-1"></i>Limpiar
+        </button>
+        <button class="btn btn-primary" (click)="buscar()" [disabled]="cargando">
+          <span
+            *ngIf="cargando"
+            class="spinner-border spinner-border-sm me-1"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          <i *ngIf="!cargando" class="bi bi-search me-1"></i>Buscar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="alert alert-danger" role="alert">{{ error }}</div>
+
+  <!-- Resultados -->
+  <div *ngIf="buscado && !cargando && !error">
+
+    <div *ngIf="resultados.length === 0" class="alert alert-info">
+      No se encontraron proyectos con los criterios indicados.
+    </div>
+
+    <div *ngIf="resultados.length > 0" class="card shadow-sm">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col" style="min-width: 200px;">Título</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Línea de investigación</th>
+              <th scope="col">Director</th>
+              <th scope="col">Estado proyecto</th>
+              <th scope="col" class="text-center">Opciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let proyecto of resultadosPaginados">
+              <td class="fw-semibold text-truncate" style="max-width: 200px;" [title]="proyecto.titulo">
+                {{ proyecto.titulo }}
+              </td>
+              <td>{{ proyecto.tipoProyecto }}</td>
+              <td>
+                <span *ngIf="proyecto.lineaInvestigacion">{{ proyecto.lineaInvestigacion.nombre }}</span>
+                <span *ngIf="!proyecto.lineaInvestigacion" class="text-muted">—</span>
+              </td>
+              <td>
+                <span *ngIf="proyecto.director">
+                  {{ proyecto.director.nombres }} {{ proyecto.director.apellidos }}
+                </span>
+                <span *ngIf="!proyecto.director" class="text-muted">—</span>
+              </td>
+              <td>
+                <span
+                  class="badge"
+                  [class.text-bg-success]="proyecto.activado"
+                  [class.text-bg-secondary]="!proyecto.activado"
+                >
+                  {{ proyecto.activado ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td class="text-center">
+                <button
+                  type="button"
+                  class="btn btn-sm text-secondary me-1"
+                  title="Ver detalle del proyecto"
+                  (click)="abrirModalVer(proyecto)"
+                >
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm text-primary"
+                  title="Ver detalle del director"
+                  [disabled]="!proyecto.director"
+                  (click)="proyecto.director && abrirModalVerDocente(proyecto.director)"
+                >
+                  <i class="bi bi-person-circle"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer con paginación -->
+      <div class="card-footer d-flex justify-content-between align-items-center">
+        <span class="text-muted small">
+          Mostrando {{ resultadosPaginados.length }} de {{ resultados.length }} resultado(s).
+        </span>
+        <nav *ngIf="totalPaginas > 1">
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item" [class.disabled]="paginaActual === 1">
+              <button class="page-link" (click)="cambiarPagina(paginaActual - 1)">&#8249;</button>
+            </li>
+            <li
+              *ngFor="let p of paginas"
+              class="page-item"
+              [class.active]="p === paginaActual"
+            >
+              <button class="page-link" (click)="cambiarPagina(p)">{{ p }}</button>
+            </li>
+            <li class="page-item" [class.disabled]="paginaActual === totalPaginas">
+              <button class="page-link" (click)="cambiarPagina(paginaActual + 1)">&#8250;</button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Modal: ver detalle del proyecto -->
+<div
+  class="modal fade"
+  [class.show]="modalVerAbierto"
+  [style.display]="modalVerAbierto ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  [attr.aria-hidden]="!modalVerAbierto"
+>
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+    <div class="modal-content" *ngIf="proyectoVer">
+
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-eye me-2"></i>Detalle del proyecto</h5>
+        <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarModalVer()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+
+          <div class="col-12">
+            <p class="text-muted small mb-1">Título</p>
+            <div class="fw-semibold" style="text-align: justify; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">{{ proyectoVer.titulo }}</div>
+          </div>
+
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Tipo de proyecto</p>
+            <span class="badge text-bg-primary fs-6">{{ proyectoVer.tipoProyecto }}</span>
+          </div>
+
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Estado</p>
+            <span
+              class="badge fs-6"
+              [class.text-bg-success]="proyectoVer.activado"
+              [class.text-bg-secondary]="!proyectoVer.activado"
+            >
+              {{ proyectoVer.activado ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Línea de investigación</p>
+            <span *ngIf="proyectoVer.lineaInvestigacion" class="badge text-bg-info fs-6">
+              {{ proyectoVer.lineaInvestigacion.nombre }}
+            </span>
+            <span *ngIf="!proyectoVer.lineaInvestigacion" class="text-muted">—</span>
+          </div>
+
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Director del proyecto</p>
+            <p class="fw-semibold mb-0" *ngIf="proyectoVer.director">
+              {{ proyectoVer.director.nombres }} {{ proyectoVer.director.apellidos }}
+            </p>
+            <span *ngIf="!proyectoVer.director" class="text-muted">—</span>
+          </div>
+
+          <div class="col-md-6" *ngIf="proyectoVer.director && proyectoVer.director.correo">
+            <p class="text-muted small mb-1">Correo del director</p>
+            <a [href]="'mailto:' + proyectoVer.director!.correo" class="fw-semibold">
+              {{ proyectoVer.director!.correo }}
+            </a>
+          </div>
+
+          <div class="col-12">
+            <p class="text-muted small mb-1">Resumen</p>
+            <div class="border rounded p-2 bg-light" style="text-align: justify; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">{{ proyectoVer.resumen }}</div>
+          </div>
+
+          <div class="col-12">
+            <p class="text-muted small mb-1">Objetivos</p>
+            <div class="border rounded p-2 bg-light" style="text-align: justify; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">{{ proyectoVer.objetivos }}</div>
+          </div>
+
+          <div class="col-12" *ngIf="proyectoVer.director && proyectoVer.director.correo">
+            <div class="alert alert-info mb-0 d-flex gap-2 align-items-start" role="note">
+              <i class="bi bi-info-circle-fill flex-shrink-0 mt-1"></i>
+              <span>
+                Si está interesado en este proyecto, puede escribir un correo al director
+                (<a [href]="'mailto:' + proyectoVer.director!.correo">{{ proyectoVer.director!.correo }}</a>)
+                con el propósito de agendar una reunión, establecer más detalles del proyecto
+                y definir cómo se desarrollará durante el Doctorado.
+              </span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="cerrarModalVer()">
+          Cerrar
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop modal proyecto -->
+<div class="modal-backdrop fade show" *ngIf="modalVerAbierto"></div>
+
+<!-- Modal: ver detalle del docente -->
+<div
+  class="modal fade"
+  [class.show]="modalVerDocenteAbierto"
+  [style.display]="modalVerDocenteAbierto ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  [attr.aria-hidden]="!modalVerDocenteAbierto"
+>
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content" *ngIf="docenteVer">
+
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-person-circle me-2"></i>Detalle del docente</h5>
+        <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarModalVerDocente()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Nombres</p>
+            <p class="fw-semibold mb-0">{{ docenteVer.nombres }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Apellidos</p>
+            <p class="fw-semibold mb-0">{{ docenteVer.apellidos }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Correo</p>
+            <p class="fw-semibold mb-0">{{ docenteVer.correo }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Oficina</p>
+            <p class="fw-semibold mb-0">{{ docenteVer.oficina }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Teléfono</p>
+            <p class="fw-semibold mb-0">{{ docenteVer.telefono || '—' }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Celular</p>
+            <p class="fw-semibold mb-0">{{ docenteVer.celular || '—' }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Grupo</p>
+            <span *ngIf="docenteVer.grupo" class="badge text-bg-info fs-6">
+              {{ docenteVer.grupo.nombre }}
+            </span>
+            <span *ngIf="!docenteVer.grupo" class="text-muted">—</span>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Estado</p>
+            <span
+              class="badge fs-6"
+              [class.text-bg-success]="docenteVer.activo"
+              [class.text-bg-secondary]="!docenteVer.activo"
+            >
+              {{ docenteVer.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+          <div class="col-12" *ngIf="docenteVer.grupo && docenteVer.grupo.descripcion">
+            <p class="text-muted small mb-1">Descripción del grupo</p>
+            <p class="mb-0">{{ docenteVer.grupo!.descripcion }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="cerrarModalVerDocente()">
+          Cerrar
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop modal docente -->
+<div class="modal-backdrop fade show" *ngIf="modalVerDocenteAbierto"></div>

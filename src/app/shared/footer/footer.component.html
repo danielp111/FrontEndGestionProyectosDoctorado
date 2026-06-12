@@ -1,0 +1,32 @@
+<footer class="site-footer">
+  <div class="footer-grid">
+    <!-- Contacto -->
+    <section class="footer-block" aria-labelledby="footer-contact-title">
+      <h2 id="footer-contact-title" class="footer-title">Contacto</h2>
+      <p class="footer-strong">{{ contact.program }}</p>
+      <p>{{ contact.faculty }}</p>
+      <p><strong>Teléfono:</strong> {{ contact.phone }}</p>
+    </section>
+
+    <!-- Enlaces de interés -->
+    <section class="footer-block" aria-labelledby="footer-links-title">
+      <h2 id="footer-links-title" class="footer-title">Enlaces de interés</h2>
+      <ul class="footer-links">
+        @for (link of quickLinks; track link.label) {
+          <li>
+            <a [href]="link.externalUrl" target="_blank" rel="noopener noreferrer">
+              {{ link.label }}
+            </a>
+          </li>
+        }
+      </ul>
+    </section>
+  </div>
+
+  <!-- Franja institucional (bloque block-block-8 original) -->
+  <div class="footer-legal">
+    <p>Universidad del Cauca | Vigilada Mineducación</p>
+    <p>Popayán, Colombia | NIT 891500319-2</p>
+    <p class="footer-copy">© {{ currentYear }} Doctorado en Ciencias de la Computación</p>
+  </div>
+</footer>

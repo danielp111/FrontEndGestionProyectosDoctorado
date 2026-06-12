@@ -38,6 +38,11 @@ export class DocenteService {
     return this.http.put<DocenteDTOSalida>(`${this.apiUrl}/${id}/estado`, null, { params });
   }
 
+  /** Elimina un docente por su ID. */
+  eliminar(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
   /** Filtra los docentes en el servidor según el DTO de filtro. */
   filtrar(filtro: DocenteFiltroDTO): Observable<DocenteDTOSalida[]> {
     let params = new HttpParams();

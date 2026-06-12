@@ -1,0 +1,204 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Registrar proyecto</h2>
+        <a
+          *ngIf="idDirectorRuta"
+          [routerLink]="['/docentes', idDirectorRuta, 'proyectos']"
+          class="btn btn-outline-secondary"
+        >
+          <i class="bi bi-arrow-left me-1"></i>Volver a mis proyectos
+        </a>
+      </div>
+
+      <div *ngIf="mensajeExito" class="alert alert-success" role="alert">
+        {{ mensajeExito }}
+      </div>
+      <div *ngIf="mensajeError" class="alert alert-danger" role="alert">
+        {{ mensajeError }}
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <form [formGroup]="form" (ngSubmit)="registrar()" novalidate>
+            <div class="row g-3">
+
+              <!-- Título -->
+              <div class="col-12">
+                <label for="titulo" class="form-label">Título <span class="text-danger">*</span></label>
+                <input
+                  id="titulo"
+                  type="text"
+                  class="form-control"
+                  formControlName="titulo"
+                  placeholder="Título del proyecto"
+                  maxlength="100"
+                  [class.is-invalid]="f['titulo'].invalid && f['titulo'].touched"
+                >
+                <div class="invalid-feedback" *ngIf="f['titulo'].touched">
+                  <span *ngIf="f['titulo'].errors?.['required']">El título del proyecto es requerido.</span>
+                  <span *ngIf="f['titulo'].errors?.['minlength']">El título debe tener al menos 5 caracteres.</span>
+                  <span *ngIf="f['titulo'].errors?.['maxlength']">El título no puede superar los 100 caracteres.</span>
+                </div>
+                <div class="form-text text-end" *ngIf="f['titulo'].value">
+                  {{ f['titulo'].value.length }}/100
+                </div>
+              </div>
+
+              <!-- Resumen -->
+              <div class="col-12">
+                <label for="resumen" class="form-label">Resumen <span class="text-danger">*</span></label>
+                <textarea
+                  id="resumen"
+                  class="form-control"
+                  rows="4"
+                  formControlName="resumen"
+                  placeholder="Resumen del proyecto"
+                  maxlength="500"
+                  [class.is-invalid]="f['resumen'].invalid && f['resumen'].touched"
+                ></textarea>
+                <div class="invalid-feedback" *ngIf="f['resumen'].touched">
+                  <span *ngIf="f['resumen'].errors?.['required']">El resumen es requerido.</span>
+                  <span *ngIf="f['resumen'].errors?.['minlength']">El resumen debe tener al menos 10 caracteres.</span>
+                  <span *ngIf="f['resumen'].errors?.['maxlength']">El resumen no puede superar los 500 caracteres.</span>
+                </div>
+                <div class="form-text text-end" *ngIf="f['resumen'].value">
+                  {{ f['resumen'].value.length }}/500
+                </div>
+              </div>
+
+              <!-- Objetivos -->
+              <div class="col-12">
+                <label for="objetivos" class="form-label">Objetivos <span class="text-danger">*</span></label>
+                <textarea
+                  id="objetivos"
+                  class="form-control"
+                  rows="4"
+                  formControlName="objetivos"
+                  placeholder="Objetivos del proyecto"
+                  maxlength="500"
+                  [class.is-invalid]="f['objetivos'].invalid && f['objetivos'].touched"
+                ></textarea>
+                <div class="invalid-feedback" *ngIf="f['objetivos'].touched">
+                  <span *ngIf="f['objetivos'].errors?.['required']">Los objetivos son requeridos.</span>
+                  <span *ngIf="f['objetivos'].errors?.['minlength']">Los objetivos deben tener al menos 10 caracteres.</span>
+                  <span *ngIf="f['objetivos'].errors?.['maxlength']">Los objetivos no pueden superar los 500 caracteres.</span>
+                </div>
+                <div class="form-text text-end" *ngIf="f['objetivos'].value">
+                  {{ f['objetivos'].value.length }}/500
+                </div>
+              </div>
+
+              <!-- Tipo de proyecto -->
+              <div class="col-md-6">
+                <label for="tipoProyecto" class="form-label">Tipo de proyecto <span class="text-danger">*</span></label>
+                <select
+                  id="tipoProyecto"
+                  class="form-select"
+                  formControlName="tipoProyecto"
+                  [class.is-invalid]="f['tipoProyecto'].invalid && f['tipoProyecto'].touched"
+                >
+                  <option value="" disabled>Seleccione un tipo...</option>
+                  <option *ngFor="let tipo of tiposProyecto" [value]="tipo">{{ tipo }}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="f['tipoProyecto'].touched">
+                  <span *ngIf="f['tipoProyecto'].errors?.['required']">El tipo de proyecto es requerido.</span>
+                </div>
+              </div>
+
+              <!-- Línea de investigación -->
+              <div class="col-md-6">
+                <label for="idLineaInvestigacion" class="form-label">Línea de investigación <span class="text-danger">*</span></label>
+                <select
+                  id="idLineaInvestigacion"
+                  class="form-select"
+                  formControlName="idLineaInvestigacion"
+                  [class.is-invalid]="f['idLineaInvestigacion'].invalid && f['idLineaInvestigacion'].touched"
+                >
+                  <option [ngValue]="null" disabled>Seleccione una línea...</option>
+                  <option *ngFor="let linea of lineasInvestigacion" [ngValue]="linea.id">
+                    {{ linea.nombre }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="f['idLineaInvestigacion'].touched">
+                  <span *ngIf="f['idLineaInvestigacion'].errors?.['required']">La línea de investigación es requerida.</span>
+                </div>
+              </div>
+
+              <!-- Director -->
+              <div class="col-md-6">
+                <label for="idDirector" class="form-label">Director <span class="text-danger" *ngIf="!directorPreasignado">*</span></label>
+
+                <!-- Campo bloqueado cuando viene preasignado desde la lista del director -->
+                <div *ngIf="directorPreasignado" class="input-group">
+                  <span class="input-group-text bg-light">
+                    <i class="bi bi-person-lock"></i>
+                  </span>
+                  <input
+                    type="text"
+                    class="form-control bg-light"
+                    [value]="directorSeleccionado ? directorSeleccionado.nombres + ' ' + directorSeleccionado.apellidos : 'Cargando...'"
+                    readonly
+                  >
+                </div>
+                <div *ngIf="directorPreasignado" class="form-text text-muted">
+                  Director asignado automáticamente.
+                </div>
+
+                <!-- Select editable cuando se accede de forma independiente -->
+                <select
+                  *ngIf="!directorPreasignado"
+                  id="idDirector"
+                  class="form-select"
+                  formControlName="idDirector"
+                  [class.is-invalid]="f['idDirector'].invalid && f['idDirector'].touched"
+                >
+                  <option [ngValue]="null" disabled>Seleccione un director...</option>
+                  <option *ngFor="let docente of docentes" [ngValue]="docente.id">
+                    {{ docente.nombres }} {{ docente.apellidos }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="!directorPreasignado && f['idDirector'].touched">
+                  <span *ngIf="f['idDirector'].errors?.['required']">El director es requerido.</span>
+                </div>
+              </div>
+
+              <!-- Activado -->
+              <div class="col-md-6 d-flex align-items-end">
+                <div class="form-check form-switch pb-1">
+                  <input
+                    id="activado"
+                    type="checkbox"
+                    class="form-check-input"
+                    formControlName="activado"
+                    role="switch"
+                  >
+                  <label class="form-check-label" for="activado">Proyecto activo</label>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+              <button type="reset" class="btn btn-outline-secondary" [disabled]="enviando"
+                (click)="form.reset({ activado: true })">
+                Limpiar
+              </button>
+              <button type="submit" class="btn btn-primary" [disabled]="enviando">
+                <span
+                  *ngIf="enviando"
+                  class="spinner-border spinner-border-sm me-1"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                Registrar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
