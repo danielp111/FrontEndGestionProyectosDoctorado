@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { GrupoDTOSalida } from '../modelos/grupo-dto-salida';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class GrupoService {
-  private readonly apiUrl = 'http://localhost:9090/api/grupos';
+  private readonly apiUrl = `${environment.apiBaseUrl}/api/grupos`;
 
   constructor(private http: HttpClient) {}
 

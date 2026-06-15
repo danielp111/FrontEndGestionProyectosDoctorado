@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 
+import { environment } from '../../../environments/environment';
+
 export interface JwtResponseDTO {
   token: string;
   email: string;
@@ -12,7 +14,7 @@ export interface JwtResponseDTO {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly apiUrl = 'http://localhost:9090/api/auth/google';
+  private readonly apiUrl = `${environment.apiBaseUrl}/api/auth/google`;
   private readonly TOKEN_KEY    = 'auth_token';
   private readonly EMAIL_KEY    = 'auth_email';
   private readonly NOMBRE_KEY   = 'auth_nombre';

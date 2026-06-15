@@ -5,11 +5,12 @@ import { Observable } from 'rxjs';
 import { ProyectoDTOResultado } from '../modelos/proyecto-dto-resultado';
 import { ProyectoDTOEntrada } from '../modelos/proyecto-dto-entrada';
 import { ProyectoFiltroDTO } from '../modelos/proyecto-filtro-dto';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ProyectoService {
-  private readonly apiUrl = 'http://localhost:9090/api/proyectos';
-  private readonly docentesUrl = 'http://localhost:9090/api/docentes';
+  private readonly apiUrl = `${environment.apiBaseUrl}/api/proyectos`;
+  private readonly docentesUrl = `${environment.apiBaseUrl}/api/docentes`;
 
   constructor(private http: HttpClient) {}
 

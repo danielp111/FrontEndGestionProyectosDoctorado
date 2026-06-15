@@ -5,10 +5,11 @@ import { Observable } from 'rxjs';
 import { DocenteDTOSalida } from '../modelos/docente-dto-salida';
 import { DocenteDTOEntrada } from '../modelos/docente-dto-entrada';
 import { DocenteFiltroDTO } from '../modelos/docente-filtro-dto';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class DocenteService {
-  private readonly apiUrl = 'http://localhost:9090/api/docentes';
+  private readonly apiUrl = `${environment.apiBaseUrl}/api/docentes`;
 
   constructor(private http: HttpClient) {}
 
