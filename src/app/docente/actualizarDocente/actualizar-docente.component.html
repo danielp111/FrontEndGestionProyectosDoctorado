@@ -1,29 +1,39 @@
 <div class="container py-4">
   <div class="row justify-content-center">
     <div class="col-lg-8">
-      <h2 class="mb-4">Actualizar docente</h2>
 
-      <div *ngIf="mensajeExito" class="alert alert-success" role="alert">
-        {{ mensajeExito }}
+      <!-- Encabezado -->
+      <div class="rf-header">
+        <div>
+          <span class="pd-eyebrow">Docentes</span>
+          <h2 class="rf-title">Actualizar docente</h2>
+        </div>
       </div>
-      <div *ngIf="mensajeError" class="alert alert-danger" role="alert">
-        {{ mensajeError }}
+
+      <div *ngIf="mensajeExito" class="rf-alert rf-alert--exito" role="status">
+        <i class="bi bi-check-circle" aria-hidden="true"></i>{{ mensajeExito }}
+      </div>
+      <div *ngIf="mensajeError" class="rf-alert rf-alert--error" role="alert">
+        <i class="bi bi-exclamation-circle" aria-hidden="true"></i>{{ mensajeError }}
       </div>
 
       <div *ngIf="cargando" class="text-center py-5 text-muted">
-        <div class="spinner-border" role="status">
+        <div class="spinner-border spinner-border-sm" role="status">
           <span class="visually-hidden">Cargando...</span>
         </div>
-        <p class="mt-2 mb-0">Cargando docente...</p>
+        <p class="mt-2 mb-0 small">Cargando docente...</p>
       </div>
 
-      <div class="card shadow-sm" *ngIf="!cargando">
-        <div class="card-body">
-          <form [formGroup]="form" (ngSubmit)="actualizar()" novalidate>
+      <form *ngIf="!cargando" class="pt-card rf-form" [formGroup]="form" (ngSubmit)="actualizar()" novalidate>
+        <div class="rf-body">
+
+          <!-- Datos personales -->
+          <section class="pd-section">
+            <h3 class="pd-section-title">Datos personales</h3>
             <div class="row g-3">
-              <!-- Nombres -->
+
               <div class="col-md-6">
-                <label for="nombres" class="form-label">Nombres <span class="text-danger">*</span></label>
+                <label for="nombres" class="rf-label">Nombres <span class="rf-required" aria-hidden="true">*</span></label>
                 <input
                   id="nombres"
                   type="text"
@@ -38,9 +48,8 @@
                 </div>
               </div>
 
-              <!-- Apellidos -->
               <div class="col-md-6">
-                <label for="apellidos" class="form-label">Apellidos <span class="text-danger">*</span></label>
+                <label for="apellidos" class="rf-label">Apellidos <span class="rf-required" aria-hidden="true">*</span></label>
                 <input
                   id="apellidos"
                   type="text"
@@ -55,62 +64,86 @@
                 </div>
               </div>
 
-              <!-- Oficina -->
-              <div class="col-md-6">
-                <label for="oficina" class="form-label">Oficina <span class="text-danger">*</span></label>
-                <input
-                  id="oficina"
-                  type="text"
-                  class="form-control"
-                  formControlName="oficina"
-                  [class.is-invalid]="f['oficina'].invalid && f['oficina'].touched"
-                >
-                <div class="invalid-feedback" *ngIf="f['oficina'].touched">
-                  <span *ngIf="f['oficina'].errors?.['required']">La oficina es requerida.</span>
-                </div>
-              </div>
+            </div>
+          </section>
 
-              <!-- Correo -->
+          <!-- Contacto -->
+          <section class="pd-section">
+            <h3 class="pd-section-title">Contacto</h3>
+            <div class="row g-3">
+
               <div class="col-md-6">
-                <label for="correo" class="form-label">Correo <span class="text-danger">*</span></label>
-                <input
-                  id="correo"
-                  type="email"
-                  class="form-control"
-                  formControlName="correo"
-                  [class.is-invalid]="f['correo'].invalid && f['correo'].touched"
-                >
-                <div class="invalid-feedback" *ngIf="f['correo'].touched">
+                <label for="correo" class="rf-label">Correo <span class="rf-required" aria-hidden="true">*</span></label>
+                <div class="pf-input-wrap">
+                  <i class="bi bi-envelope pf-input-icon" aria-hidden="true"></i>
+                  <input
+                    id="correo"
+                    type="email"
+                    class="form-control pf-control--icon"
+                    formControlName="correo"
+                    [class.is-invalid]="f['correo'].invalid && f['correo'].touched"
+                  >
+                </div>
+                <!-- Fuera del contenedor del ícono para no desplazarlo; d-block porque ya no es hermano del input -->
+                <div class="invalid-feedback" [class.d-block]="f['correo'].invalid && f['correo'].touched">
                   <span *ngIf="f['correo'].errors?.['required']">El correo es requerido.</span>
                   <span *ngIf="f['correo'].errors?.['email']">Debe proporcionar un correo electrónico válido.</span>
                 </div>
               </div>
 
-              <!-- Teléfono -->
               <div class="col-md-6">
-                <label for="telefono" class="form-label">Teléfono</label>
-                <input
-                  id="telefono"
-                  type="text"
-                  class="form-control"
-                  formControlName="telefono"
-                >
+                <label for="oficina" class="rf-label">Oficina <span class="rf-required" aria-hidden="true">*</span></label>
+                <div class="pf-input-wrap">
+                  <i class="bi bi-door-open pf-input-icon" aria-hidden="true"></i>
+                  <input
+                    id="oficina"
+                    type="text"
+                    class="form-control pf-control--icon"
+                    formControlName="oficina"
+                    [class.is-invalid]="f['oficina'].invalid && f['oficina'].touched"
+                  >
+                </div>
+                <div class="invalid-feedback" [class.d-block]="f['oficina'].invalid && f['oficina'].touched">
+                  <span *ngIf="f['oficina'].errors?.['required']">La oficina es requerida.</span>
+                </div>
               </div>
 
-              <!-- Celular -->
               <div class="col-md-6">
-                <label for="celular" class="form-label">Celular</label>
-                <input
-                  id="celular"
-                  type="text"
-                  class="form-control"
-                  formControlName="celular"
-                >
+                <label for="telefono" class="rf-label">Teléfono</label>
+                <div class="pf-input-wrap">
+                  <i class="bi bi-telephone pf-input-icon" aria-hidden="true"></i>
+                  <input
+                    id="telefono"
+                    type="text"
+                    class="form-control pf-control--icon"
+                    formControlName="telefono"
+                  >
+                </div>
               </div>
 
-              <!-- Grupo -->
               <div class="col-md-6">
-                <label for="idGrupo" class="form-label">Grupo <span class="text-danger">*</span></label>
+                <label for="celular" class="rf-label">Celular</label>
+                <div class="pf-input-wrap">
+                  <i class="bi bi-phone pf-input-icon" aria-hidden="true"></i>
+                  <input
+                    id="celular"
+                    type="text"
+                    class="form-control pf-control--icon"
+                    formControlName="celular"
+                  >
+                </div>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- Vinculación -->
+          <section class="pd-section">
+            <h3 class="pd-section-title">Vinculación</h3>
+            <div class="row g-3">
+
+              <div class="col-md-6">
+                <label for="idGrupo" class="rf-label">Grupo de investigación <span class="rf-required" aria-hidden="true">*</span></label>
                 <select
                   id="idGrupo"
                   class="form-select"
@@ -127,41 +160,47 @@
                 </div>
               </div>
 
-              <!-- Activo — solo ADMINISTRADOR -->
-              <div class="col-md-6 d-flex align-items-end" *ngIf="esAdmin">
-                <div class="form-check form-switch mb-1">
+              <!-- Activo: solo ADMINISTRADOR -->
+              <div class="col-md-6" *ngIf="esAdmin">
+                <span class="rf-label">Estado</span>
+                <div class="form-check form-switch rf-switch">
                   <input
                     id="activo"
                     class="form-check-input"
                     type="checkbox"
                     role="switch"
                     formControlName="activo"
-                    style="cursor: pointer;"
                   >
                   <label class="form-check-label" for="activo">
                     {{ f['activo'].value ? 'Activo' : 'Inactivo' }}
                   </label>
                 </div>
               </div>
-            </div>
 
-            <div class="d-flex justify-content-end gap-2 mt-4">
-              <button type="button" class="btn btn-outline-secondary" (click)="volver()" [disabled]="enviando">
-                Cancelar
-              </button>
-              <button type="submit" class="btn btn-primary" [disabled]="enviando">
-                <span
-                  *ngIf="enviando"
-                  class="spinner-border spinner-border-sm me-1"
-                  role="status"
-                  aria-hidden="true"
-                ></span>
-                Guardar cambios
-              </button>
             </div>
-          </form>
+          </section>
+
         </div>
-      </div>
+
+        <div class="pt-footer rf-footer">
+          <span class="rf-help mt-0"><span class="rf-required" aria-hidden="true">*</span> Campos obligatorios</span>
+          <div class="pf-buttons">
+            <button type="button" class="pf-clear" (click)="volver()" [disabled]="enviando">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-dark pd-btn" [disabled]="enviando">
+              <span
+                *ngIf="enviando"
+                class="spinner-border spinner-border-sm me-1"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              Guardar cambios
+            </button>
+          </div>
+        </div>
+      </form>
+
     </div>
   </div>
 </div>

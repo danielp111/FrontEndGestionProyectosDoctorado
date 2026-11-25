@@ -3,6 +3,7 @@ import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../servicios/auth.service';
 import { GOOGLE_CLIENT_ID } from '../google-client-id';
+import { extraerMensajeError } from '../../shared/utils/error.util';
 
 declare const google: {
   accounts: {
@@ -52,9 +53,12 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
-    this.intervalo = setInterval(() => {
-      this.ngZone.run(() => this.siguiente());
-    }, 3000);
+    // Fuera de la zona para que el intervalo no impida que la app se estabilice (hidratación)
+    this.ngZone.runOutsideAngular(() => {
+      this.intervalo = setInterval(() => {
+        this.ngZone.run(() => this.siguiente());
+      }, 3000);
+    });
 
     if (this.authService.isLoggedIn()) {
       this.router.navigate(['/docentes']);
@@ -86,7 +90,7 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
       },
       error: (err) => {
         this.cargando = false;
-        this.error = err?.error?.message ?? 'No fue posible iniciar sesión. Contacta con el administrador del sistema.';
+        this.error = extraerMensajeError(err, 'No fue posible iniciar sesión. Contacta con el administrador del sistema.');
       }
     });
   }

@@ -1,78 +1,79 @@
 <div class="container py-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0">Docentes</h2>
-    <div class="d-flex gap-2">
-      <a class="btn btn-primary" routerLink="/docentes/registrar">
-        <i class="bi bi-person-plus me-1"></i>Registrar docente
-      </a>
+
+  <!-- Encabezado -->
+  <div class="rf-header">
+    <div>
+      <span class="pd-eyebrow">Administración</span>
+      <h2 class="rf-title">Docentes</h2>
     </div>
+    <a class="btn btn-dark pd-btn pf-submit" routerLink="/docentes/registrar">
+      <i class="bi bi-person-plus me-1" aria-hidden="true"></i>Registrar docente
+    </a>
   </div>
 
-  <!-- Filtros -->
-  <div class="card mb-4 shadow-sm">
-    <div class="card-header bg-light fw-semibold">Filtrar docentes</div>
-    <div class="card-body">
-      <div class="row g-3">
-        <div class="col-md-4">
-          <label for="filtroNombres" class="form-label">Nombres</label>
-          <input
-            id="filtroNombres"
-            type="text"
-            class="form-control"
-            placeholder="Ej. Juan"
-            [(ngModel)]="filtro.nombres" (ngModelChange)="paginaActual = 1"
-          >
-        </div>
-        <div class="col-md-4">
-          <label for="filtroApellidos" class="form-label">Apellidos</label>
-          <input
-            id="filtroApellidos"
-            type="text"
-            class="form-control"
-            placeholder="Ej. Pérez"
-            [(ngModel)]="filtro.apellidos" (ngModelChange)="paginaActual = 1"
-          >
-        </div>
-        <div class="col-md-4">
-          <label for="filtroNombreGrupo" class="form-label">Grupo</label>
-          <input
-            id="filtroNombreGrupo"
-            type="text"
-            class="form-control"
-            placeholder="Nombre del grupo"
-            [(ngModel)]="filtro.nombreGrupo" (ngModelChange)="paginaActual = 1"
-          >
-        </div>
-      </div>
-      <div class="mt-3 text-end">
-        <button
-          class="btn btn-secondary"
-          (click)="limpiarFiltros()"
-          [disabled]="!hayFiltrosActivos()"
+  <!-- Filtros (se aplican en el navegador sobre la lista cargada) -->
+  <div class="pt-card pf-bar mb-4" role="search" aria-label="Filtrar docentes">
+    <div class="pf-grid pf-grid--compacta">
+
+      <div class="pf-field">
+        <label for="filtroNombres" class="pf-label">Nombres</label>
+        <input
+          id="filtroNombres"
+          type="text"
+          class="form-control pf-control"
+          placeholder="Ej. Juan"
+          [(ngModel)]="filtro.nombres" (ngModelChange)="paginaActual = 1"
         >
+      </div>
+
+      <div class="pf-field">
+        <label for="filtroApellidos" class="pf-label">Apellidos</label>
+        <input
+          id="filtroApellidos"
+          type="text"
+          class="form-control pf-control"
+          placeholder="Ej. Pérez"
+          [(ngModel)]="filtro.apellidos" (ngModelChange)="paginaActual = 1"
+        >
+      </div>
+
+      <div class="pf-field">
+        <label for="filtroNombreGrupo" class="pf-label">Grupo</label>
+        <input
+          id="filtroNombreGrupo"
+          type="text"
+          class="form-control pf-control"
+          placeholder="Nombre del grupo"
+          [(ngModel)]="filtro.nombreGrupo" (ngModelChange)="paginaActual = 1"
+        >
+      </div>
+
+      <div class="pf-field pf-field--accion">
+        <button type="button" class="pf-clear" (click)="limpiarFiltros()" [disabled]="!hayFiltrosActivos()">
           Limpiar filtros
         </button>
       </div>
+
     </div>
   </div>
 
   <!-- Estados -->
-  <div *ngIf="error" class="alert alert-danger" role="alert">
-    {{ error }}
+  <div *ngIf="error" class="rf-alert rf-alert--error" role="alert">
+    <i class="bi bi-exclamation-circle" aria-hidden="true"></i>{{ error }}
   </div>
 
   <div *ngIf="cargando && !error" class="text-center py-5 text-muted">
-    <div class="spinner-border" role="status">
+    <div class="spinner-border spinner-border-sm" role="status">
       <span class="visually-hidden">Cargando...</span>
     </div>
-    <p class="mt-2 mb-0">Cargando docentes...</p>
+    <p class="mt-2 mb-0 small">Cargando docentes...</p>
   </div>
 
   <!-- Tabla -->
-  <div *ngIf="!cargando && !error" class="card shadow-sm">
+  <div *ngIf="!cargando && !error" class="pt-card">
     <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
-        <thead class="table-light">
+      <table class="table pt-table align-middle mb-0">
+        <thead>
           <tr>
             <th scope="col">#</th>
             <th scope="col">Nombres</th>
@@ -81,22 +82,19 @@
             <th scope="col">Correo</th>
             <th scope="col">Oficina</th>
             <th scope="col">Estado</th>
-            <th scope="col" class="text-center">Opciones</th>
+            <th scope="col" class="text-end">Opciones</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let docente of docentesPaginados">
-            <td>{{ docente.id }}</td>
-            <td>{{ docente.nombres }}</td>
-            <td>{{ docente.apellidos }}</td>
-            <td>
-              <span *ngIf="docente.grupo">{{ docente.grupo.nombre }}</span>
-              <span *ngIf="!docente.grupo" class="text-muted">—</span>
-            </td>
-            <td>{{ docente.correo }}</td>
+            <td class="pt-id">{{ docente.id }}</td>
+            <td class="pt-title">{{ docente.nombres }}</td>
+            <td class="pt-title">{{ docente.apellidos }}</td>
+            <td>{{ docente.grupo ? docente.grupo.nombre : '—' }}</td>
+            <td class="pt-muted-cell">{{ docente.correo }}</td>
             <td>{{ docente.oficina }}</td>
             <td>
-              <div class="form-check form-switch">
+              <div class="form-check form-switch rf-switch pt-switch">
                 <input
                   class="form-check-input"
                   type="checkbox"
@@ -105,67 +103,71 @@
                   [checked]="docente.activo"
                   (change)="cambiarEstado(docente, $any($event.target).checked)"
                 >
-                <label class="form-check-label" [for]="'estado-' + docente.id">
-                  <span class="badge" [class.text-bg-success]="docente.activo" [class.text-bg-secondary]="!docente.activo">
-                    {{ docente.activo ? 'Activo' : 'Inactivo' }}
-                  </span>
+                <label class="form-check-label" [for]="'estado-' + docente.id"
+                  [class.pt-switch-label--inactivo]="!docente.activo">
+                  {{ docente.activo ? 'Activo' : 'Inactivo' }}
                 </label>
               </div>
             </td>
-            <td class="text-center">
+            <td class="text-end text-nowrap">
               <button
                 type="button"
-                class="btn btn-sm text-secondary me-1"
+                class="pt-action"
                 title="Ver detalle"
+                aria-label="Ver detalle del docente"
                 (click)="abrirModalVer(docente)"
               >
-                <i class="bi bi-eye"></i>
+                <i class="bi bi-eye" aria-hidden="true"></i>
               </button>
               <button
                 type="button"
-                class="btn btn-sm text-primary"
+                class="pt-action"
                 title="Editar docente"
+                aria-label="Editar docente"
                 (click)="abrirModalEditar(docente)"
               >
-                <i class="bi bi-pencil"></i>
+                <i class="bi bi-pencil" aria-hidden="true"></i>
               </button>
               <button
                 type="button"
-                class="btn btn-sm text-danger"
+                class="pt-action pt-action--peligro"
                 title="Eliminar docente"
+                aria-label="Eliminar docente"
                 (click)="confirmarEliminar(docente)"
               >
-                <i class="bi bi-trash"></i>
+                <i class="bi bi-trash" aria-hidden="true"></i>
               </button>
             </td>
           </tr>
 
           <tr *ngIf="docentesFiltrados.length === 0">
-            <td colspan="8" class="text-center text-muted py-4">
+            <td colspan="8" class="pt-empty">
               No se encontraron docentes que coincidan con el filtro.
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div class="card-footer d-flex justify-content-between align-items-center">
-      <span class="text-muted small">
-        Mostrando {{ docentesPaginados.length }} de {{ docentesFiltrados.length }} docente(s).
+
+    <!-- Paginación -->
+    <div class="pt-footer">
+      <span class="pt-count">
+        Mostrando {{ docentesPaginados.length }} de {{ docentesFiltrados.length }} docente(s)
       </span>
-      <nav *ngIf="totalPaginas > 1">
-        <ul class="pagination pagination-sm mb-0">
-          <li class="page-item" [class.disabled]="paginaActual === 1">
-            <button class="page-link" (click)="cambiarPagina(paginaActual - 1)">&#8249;</button>
+      <nav *ngIf="totalPaginas > 1" aria-label="Paginación de docentes">
+        <ul class="pt-pagination">
+          <li>
+            <button type="button" aria-label="Página anterior" [disabled]="paginaActual === 1"
+              (click)="cambiarPagina(paginaActual - 1)">&#8249;</button>
           </li>
-          <li
-            *ngFor="let p of paginas"
-            class="page-item"
-            [class.active]="p === paginaActual"
-          >
-            <button class="page-link" (click)="cambiarPagina(p)">{{ p }}</button>
+          <li *ngFor="let p of paginas">
+            <button type="button" [class.active]="p === paginaActual"
+              [attr.aria-current]="p === paginaActual ? 'page' : null"
+              (click)="cambiarPagina(p)">{{ p }}</button>
           </li>
-          <li class="page-item" [class.disabled]="paginaActual === totalPaginas">
-            <button class="page-link" (click)="cambiarPagina(paginaActual + 1)">&#8250;</button>
+          <li>
+            <button type="button" aria-label="Página siguiente" [disabled]="paginaActual === totalPaginas"
+              (click)="cambiarPagina(paginaActual + 1)">&#8250;</button>
           </li>
         </ul>
       </nav>
@@ -182,140 +184,172 @@
   role="dialog"
   [attr.aria-hidden]="!modalAbierto"
 >
-  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <form [formGroup]="form" (ngSubmit)="guardarCambios()" novalidate>
-        <div class="modal-header">
-          <h5 class="modal-title">Actualizar docente</h5>
-          <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarModal()"></button>
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+    <div class="modal-content pd-modal">
+      <form class="rf-form pd-modal-form" [formGroup]="form" (ngSubmit)="guardarCambios()" novalidate>
+
+        <div class="pd-header">
+          <div class="pd-header-top">
+            <span class="pd-eyebrow">Editar docente</span>
+            <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarModal()"></button>
+          </div>
+          <h5 class="pd-title mb-0">Actualizar docente</h5>
         </div>
 
-        <div class="modal-body">
-          <div *ngIf="errorModal" class="alert alert-danger" role="alert">
-            {{ errorModal }}
+        <div class="modal-body pd-body">
+          <div *ngIf="errorModal" class="rf-alert rf-alert--error" role="alert">
+            <i class="bi bi-exclamation-circle" aria-hidden="true"></i>{{ errorModal }}
           </div>
 
-          <div class="row g-3">
-            <!-- Nombres -->
-            <div class="col-md-6">
-              <label for="m-nombres" class="form-label">Nombres <span class="text-danger">*</span></label>
-              <input
-                id="m-nombres"
-                type="text"
-                class="form-control"
-                formControlName="nombres"
-                [class.is-invalid]="fm['nombres'].invalid && fm['nombres'].touched"
-              >
-              <div class="invalid-feedback" *ngIf="fm['nombres'].touched">
-                <span *ngIf="fm['nombres'].errors?.['required']">El nombre del docente es requerido.</span>
-                <span *ngIf="fm['nombres'].errors?.['minlength']">El nombre debe tener al menos 3 caracteres.</span>
-                <span *ngIf="fm['nombres'].errors?.['maxlength']">El nombre no puede superar los 50 caracteres.</span>
-              </div>
-            </div>
-
-            <!-- Apellidos -->
-            <div class="col-md-6">
-              <label for="m-apellidos" class="form-label">Apellidos <span class="text-danger">*</span></label>
-              <input
-                id="m-apellidos"
-                type="text"
-                class="form-control"
-                formControlName="apellidos"
-                [class.is-invalid]="fm['apellidos'].invalid && fm['apellidos'].touched"
-              >
-              <div class="invalid-feedback" *ngIf="fm['apellidos'].touched">
-                <span *ngIf="fm['apellidos'].errors?.['required']">El apellido del docente es requerido.</span>
-                <span *ngIf="fm['apellidos'].errors?.['minlength']">El apellido debe tener al menos 3 caracteres.</span>
-                <span *ngIf="fm['apellidos'].errors?.['maxlength']">El apellido no puede superar los 50 caracteres.</span>
-              </div>
-            </div>
-
-            <!-- Oficina -->
-            <div class="col-md-6">
-              <label for="m-oficina" class="form-label">Oficina <span class="text-danger">*</span></label>
-              <input
-                id="m-oficina"
-                type="text"
-                class="form-control"
-                formControlName="oficina"
-                [class.is-invalid]="fm['oficina'].invalid && fm['oficina'].touched"
-              >
-              <div class="invalid-feedback" *ngIf="fm['oficina'].touched">
-                <span *ngIf="fm['oficina'].errors?.['required']">La oficina es requerida.</span>
-              </div>
-            </div>
-
-            <!-- Correo -->
-            <div class="col-md-6">
-              <label for="m-correo" class="form-label">Correo <span class="text-danger">*</span></label>
-              <input
-                id="m-correo"
-                type="email"
-                class="form-control"
-                formControlName="correo"
-                [class.is-invalid]="fm['correo'].invalid && fm['correo'].touched"
-              >
-              <div class="invalid-feedback" *ngIf="fm['correo'].touched">
-                <span *ngIf="fm['correo'].errors?.['required']">El correo es requerido.</span>
-                <span *ngIf="fm['correo'].errors?.['email']">Debe proporcionar un correo electrónico válido.</span>
-              </div>
-            </div>
-
-            <!-- Teléfono -->
-            <div class="col-md-6">
-              <label for="m-telefono" class="form-label">Teléfono</label>
-              <input id="m-telefono" type="text" class="form-control" formControlName="telefono">
-            </div>
-
-            <!-- Celular -->
-            <div class="col-md-6">
-              <label for="m-celular" class="form-label">Celular</label>
-              <input id="m-celular" type="text" class="form-control" formControlName="celular">
-            </div>
-
-            <!-- Estado -->
-            <div class="col-md-6 d-flex align-items-end">
-              <div class="form-check form-switch mb-1">
+          <!-- Datos personales -->
+          <section class="pd-section">
+            <h6 class="pd-section-title">Datos personales</h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="m-nombres" class="rf-label">Nombres <span class="rf-required" aria-hidden="true">*</span></label>
                 <input
-                  id="m-activo"
-                  class="form-check-input"
-                  type="checkbox"
-                  role="switch"
-                  formControlName="activo"
-                  style="cursor: pointer;"
+                  id="m-nombres"
+                  type="text"
+                  class="form-control"
+                  formControlName="nombres"
+                  [class.is-invalid]="fm['nombres'].invalid && fm['nombres'].touched"
                 >
-                <label class="form-check-label" for="m-activo">
-                  {{ fm['activo'].value ? 'Activo' : 'Inactivo' }}
-                </label>
+                <div class="invalid-feedback" *ngIf="fm['nombres'].touched">
+                  <span *ngIf="fm['nombres'].errors?.['required']">El nombre del docente es requerido.</span>
+                  <span *ngIf="fm['nombres'].errors?.['minlength']">El nombre debe tener al menos 3 caracteres.</span>
+                  <span *ngIf="fm['nombres'].errors?.['maxlength']">El nombre no puede superar los 50 caracteres.</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="m-apellidos" class="rf-label">Apellidos <span class="rf-required" aria-hidden="true">*</span></label>
+                <input
+                  id="m-apellidos"
+                  type="text"
+                  class="form-control"
+                  formControlName="apellidos"
+                  [class.is-invalid]="fm['apellidos'].invalid && fm['apellidos'].touched"
+                >
+                <div class="invalid-feedback" *ngIf="fm['apellidos'].touched">
+                  <span *ngIf="fm['apellidos'].errors?.['required']">El apellido del docente es requerido.</span>
+                  <span *ngIf="fm['apellidos'].errors?.['minlength']">El apellido debe tener al menos 3 caracteres.</span>
+                  <span *ngIf="fm['apellidos'].errors?.['maxlength']">El apellido no puede superar los 50 caracteres.</span>
+                </div>
               </div>
             </div>
+          </section>
 
-            <!-- Grupo -->
-            <div class="col-md-6">
-              <label for="m-idGrupo" class="form-label">Grupo <span class="text-danger">*</span></label>
-              <select
-                id="m-idGrupo"
-                class="form-select"
-                formControlName="idGrupo"
-                [class.is-invalid]="fm['idGrupo'].invalid && fm['idGrupo'].touched"
-              >
-                <option [ngValue]="null" disabled>Seleccione un grupo...</option>
-                <option *ngFor="let grupo of grupos" [ngValue]="grupo.id">
-                  {{ grupo.nombre }}
-                </option>
-              </select>
-              <div class="invalid-feedback" *ngIf="fm['idGrupo'].touched">
-                <span *ngIf="fm['idGrupo'].errors?.['required']">El grupo es requerido.</span>
+          <!-- Contacto -->
+          <section class="pd-section">
+            <h6 class="pd-section-title">Contacto</h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="m-correo" class="rf-label">Correo <span class="rf-required" aria-hidden="true">*</span></label>
+                <div class="pf-input-wrap">
+                  <i class="bi bi-envelope pf-input-icon" aria-hidden="true"></i>
+                  <input
+                    id="m-correo"
+                    type="email"
+                    class="form-control pf-control--icon"
+                    formControlName="correo"
+                    [class.is-invalid]="fm['correo'].invalid && fm['correo'].touched"
+                  >
+                </div>
+                <div class="invalid-feedback" [class.d-block]="fm['correo'].invalid && fm['correo'].touched">
+                  <span *ngIf="fm['correo'].errors?.['required']">El correo es requerido.</span>
+                  <span *ngIf="fm['correo'].errors?.['email']">Debe proporcionar un correo electrónico válido.</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="m-oficina" class="rf-label">Oficina <span class="rf-required" aria-hidden="true">*</span></label>
+                <div class="pf-input-wrap">
+                  <i class="bi bi-door-open pf-input-icon" aria-hidden="true"></i>
+                  <input
+                    id="m-oficina"
+                    type="text"
+                    class="form-control pf-control--icon"
+                    formControlName="oficina"
+                    [class.is-invalid]="fm['oficina'].invalid && fm['oficina'].touched"
+                  >
+                </div>
+                <div class="invalid-feedback" [class.d-block]="fm['oficina'].invalid && fm['oficina'].touched">
+                  <span *ngIf="fm['oficina'].errors?.['required']">La oficina es requerida.</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="m-telefono" class="rf-label">Teléfono</label>
+                <div class="pf-input-wrap">
+                  <i class="bi bi-telephone pf-input-icon" aria-hidden="true"></i>
+                  <input
+                    id="m-telefono"
+                    type="text"
+                    class="form-control pf-control--icon"
+                    formControlName="telefono"
+                  >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="m-celular" class="rf-label">Celular</label>
+                <div class="pf-input-wrap">
+                  <i class="bi bi-phone pf-input-icon" aria-hidden="true"></i>
+                  <input
+                    id="m-celular"
+                    type="text"
+                    class="form-control pf-control--icon"
+                    formControlName="celular"
+                  >
+                </div>
               </div>
             </div>
-          </div>
+          </section>
+
+          <!-- Vinculación -->
+          <section class="pd-section">
+            <h6 class="pd-section-title">Vinculación</h6>
+            <div class="row g-3">
+
+              <div class="col-md-6">
+                <label for="m-idGrupo" class="rf-label">Grupo de investigación <span class="rf-required" aria-hidden="true">*</span></label>
+                <select
+                  id="m-idGrupo"
+                  class="form-select"
+                  formControlName="idGrupo"
+                  [class.is-invalid]="fm['idGrupo'].invalid && fm['idGrupo'].touched"
+                >
+                  <option [ngValue]="null" disabled>Seleccione un grupo...</option>
+                  <option *ngFor="let grupo of grupos" [ngValue]="grupo.id">
+                    {{ grupo.nombre }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="fm['idGrupo'].touched">
+                  <span *ngIf="fm['idGrupo'].errors?.['required']">El grupo es requerido.</span>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <span class="rf-label">Estado</span>
+                <div class="form-check form-switch rf-switch">
+                  <input
+                    id="m-activo"
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    formControlName="activo"
+                  >
+                  <label class="form-check-label" for="m-activo">
+                    {{ fm['activo'].value ? 'Activo' : 'Inactivo' }}
+                  </label>
+                </div>
+              </div>
+
+            </div>
+          </section>
         </div>
 
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" (click)="cerrarModal()" [disabled]="guardando">
+        <div class="modal-footer pd-footer">
+          <button type="button" class="pf-clear" (click)="cerrarModal()" [disabled]="guardando">
             Cancelar
           </button>
-          <button type="submit" class="btn btn-primary" [disabled]="guardando">
+          <button type="submit" class="btn btn-dark pd-btn" [disabled]="guardando">
             <span
               *ngIf="guardando"
               class="spinner-border spinner-border-sm me-1"
@@ -325,6 +359,7 @@
             Guardar cambios
           </button>
         </div>
+
       </form>
     </div>
   </div>
@@ -343,69 +378,59 @@
   [attr.aria-hidden]="!modalVerAbierto"
 >
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-    <div class="modal-content" *ngIf="docenteVer">
-      <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="bi bi-person-circle me-2"></i>Detalle del docente
-        </h5>
-        <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarModalVer()"></button>
-      </div>
+    <div class="modal-content pd-modal" *ngIf="docenteVer">
 
-      <div class="modal-body">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <p class="text-muted small mb-1">Nombres</p>
-            <p class="fw-semibold mb-0">{{ docenteVer.nombres }}</p>
-          </div>
-          <div class="col-md-6">
-            <p class="text-muted small mb-1">Apellidos</p>
-            <p class="fw-semibold mb-0">{{ docenteVer.apellidos }}</p>
-          </div>
-          <div class="col-md-6">
-            <p class="text-muted small mb-1">Correo</p>
-            <p class="fw-semibold mb-0">{{ docenteVer.correo }}</p>
-          </div>
-          <div class="col-md-6">
-            <p class="text-muted small mb-1">Oficina</p>
-            <p class="fw-semibold mb-0">{{ docenteVer.oficina }}</p>
-          </div>
-          <div class="col-md-6">
-            <p class="text-muted small mb-1">Teléfono</p>
-            <p class="fw-semibold mb-0">{{ docenteVer.telefono || '—' }}</p>
-          </div>
-          <div class="col-md-6">
-            <p class="text-muted small mb-1">Celular</p>
-            <p class="fw-semibold mb-0">{{ docenteVer.celular || '—' }}</p>
-          </div>
-          <div class="col-md-6">
-            <p class="text-muted small mb-1">Grupo</p>
-            <span *ngIf="docenteVer.grupo" class="fw-semibold mb-0">
-              {{ docenteVer.grupo.nombre }}
-            </span>
-            <span *ngIf="!docenteVer.grupo" class="text-muted">—</span>
-          </div>
-          <div class="col-md-6">
-            <p class="text-muted small mb-1">Estado</p>
-            <span
-              class="badge fs-6"
-              [class.text-bg-success]="docenteVer.activo"
-              [class.text-bg-secondary]="!docenteVer.activo"
-            >
-              {{ docenteVer.activo ? 'Activo' : 'Inactivo' }}
-            </span>
-          </div>
-          <div class="col-12" *ngIf="docenteVer.grupo?.descripcion">
-            <p class="text-muted small mb-1">Descripción del grupo</p>
-            <p class="mb-0">{{ docenteVer.grupo!.descripcion }}</p>
-          </div>
+      <div class="pd-header">
+        <div class="pd-header-top">
+          <span class="pd-eyebrow">Detalle del docente</span>
+          <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarModalVer()"></button>
         </div>
+        <h5 class="pd-title">{{ docenteVer.nombres }} {{ docenteVer.apellidos }}</h5>
+        <span class="pd-status" [class.pd-status--activo]="docenteVer.activo">
+          <span class="pd-status-dot" aria-hidden="true"></span>
+          {{ docenteVer.activo ? 'Activo' : 'Inactivo' }}
+        </span>
       </div>
 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" (click)="cerrarModalVer()">
+      <div class="modal-body pd-body">
+        <dl class="pd-meta">
+          <div class="pd-meta-item">
+            <dt><i class="bi bi-envelope" aria-hidden="true"></i>Correo</dt>
+            <dd>
+              <a *ngIf="docenteVer.correo" [href]="'mailto:' + docenteVer.correo">{{ docenteVer.correo }}</a>
+              <ng-container *ngIf="!docenteVer.correo">—</ng-container>
+            </dd>
+          </div>
+          <div class="pd-meta-item">
+            <dt><i class="bi bi-door-open" aria-hidden="true"></i>Oficina</dt>
+            <dd>{{ docenteVer.oficina || '—' }}</dd>
+          </div>
+          <div class="pd-meta-item">
+            <dt><i class="bi bi-telephone" aria-hidden="true"></i>Teléfono</dt>
+            <dd>{{ docenteVer.telefono || '—' }}</dd>
+          </div>
+          <div class="pd-meta-item">
+            <dt><i class="bi bi-phone" aria-hidden="true"></i>Celular</dt>
+            <dd>{{ docenteVer.celular || '—' }}</dd>
+          </div>
+          <div class="pd-meta-item">
+            <dt><i class="bi bi-people" aria-hidden="true"></i>Grupo de investigación</dt>
+            <dd>{{ docenteVer.grupo ? docenteVer.grupo.nombre : '—' }}</dd>
+          </div>
+        </dl>
+
+        <section class="pd-section" *ngIf="docenteVer.grupo && docenteVer.grupo.descripcion">
+          <h6 class="pd-section-title">Descripción del grupo</h6>
+          <p class="pd-text">{{ docenteVer.grupo!.descripcion }}</p>
+        </section>
+      </div>
+
+      <div class="modal-footer pd-footer">
+        <button type="button" class="btn btn-dark pd-btn" (click)="cerrarModalVer()">
           Cerrar
         </button>
       </div>
+
     </div>
   </div>
 </div>

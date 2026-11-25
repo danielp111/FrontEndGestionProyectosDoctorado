@@ -7,11 +7,14 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { ProyectoDTOResultado } from '../modelos/proyecto-dto-resultado';
 import { ProyectoDTOEntrada } from '../modelos/proyecto-dto-entrada';
 import { LineaInvestigacionDTOSalida } from '../modelos/linea-investigacion-dto-salida';
+import { TipoProyectoDTOSalida } from '../modelos/tipo-proyecto-dto-salida';
 import { ProyectoService } from '../servicios/proyecto.service';
 import { LineaInvestigacionService } from '../servicios/linea-investigacion.service';
+import { TipoProyectoService } from '../servicios/tipo-proyecto.service';
 import { DocenteService } from '../../docente/servicios/docente.service';
 import { DocenteDTOSalida } from '../../docente/modelos/docente-dto-salida';
 import { AuthService } from '../../auth/servicios/auth.service';
+import { extraerMensajeError } from '../../shared/utils/error.util';
 
 @Component({
   selector: 'app-listar-proyectos-director',
@@ -45,13 +48,7 @@ export class ListarProyectosDirectorComponent implements OnInit {
   paginaActual = 1;
   readonly elementosPorPagina = 5;
 
-  readonly tiposProyecto = [
-    'Tesis doctoral',
-    'Trabajo de grado',
-    'Investigación aplicada',
-    'Desarrollo tecnológico',
-    'Innovación'
-  ];
+  tiposProyecto: TipoProyectoDTOSalida[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -59,6 +56,7 @@ export class ListarProyectosDirectorComponent implements OnInit {
     private fb: FormBuilder,
     private proyectoService: ProyectoService,
     private lineaInvestigacionService: LineaInvestigacionService,
+    private tipoProyectoService: TipoProyectoService,
     private docenteService: DocenteService,
     private authService: AuthService
   ) {
@@ -66,7 +64,7 @@ export class ListarProyectosDirectorComponent implements OnInit {
       titulo: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
       resumen: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
       objetivos: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
-      tipoProyecto: ['', [Validators.required]],
+      idTipoProyecto: [null, [Validators.required]],
       idLineaInvestigacion: [null, [Validators.required]],
       idDirector: [null, [Validators.required]],
       activado: [true]
@@ -95,6 +93,7 @@ export class ListarProyectosDirectorComponent implements OnInit {
     this.cargarDirector();
     this.cargarProyectos();
     this.cargarLineasInvestigacion();
+    this.cargarTiposProyecto();
     this.cargarDocentes();
   }
 
@@ -127,6 +126,13 @@ export class ListarProyectosDirectorComponent implements OnInit {
     });
   }
 
+  cargarTiposProyecto(): void {
+    this.tipoProyectoService.listar().subscribe({
+      next: (data) => { this.tiposProyecto = data; },
+      error: () => { /* no bloquea la vista principal */ }
+    });
+  }
+
   cargarDocentes(): void {
     this.docenteService.listar().subscribe({
       next: (data) => { this.docentes = data; },
@@ -139,7 +145,7 @@ export class ListarProyectosDirectorComponent implements OnInit {
       const coincideTitulo = !this.filtroTitulo ||
         p.titulo.toLowerCase().includes(this.filtroTitulo.toLowerCase());
       const coincideTipo = !this.filtroTipo ||
-        p.tipoProyecto === this.filtroTipo;
+        p.tipoProyecto?.nombre === this.filtroTipo;
       const coincideLinea = !this.filtroLinea ||
         p.lineaInvestigacion?.nombre === this.filtroLinea;
       return coincideTitulo && coincideTipo && coincideLinea;
@@ -188,7 +194,7 @@ export class ListarProyectosDirectorComponent implements OnInit {
       titulo: proyecto.titulo,
       resumen: proyecto.resumen,
       objetivos: proyecto.objetivos,
-      tipoProyecto: proyecto.tipoProyecto,
+      idTipoProyecto: proyecto.tipoProyecto?.id ?? null,
       idLineaInvestigacion: proyecto.lineaInvestigacion?.id ?? null,
       idDirector: proyecto.director?.id ?? null,
       activado: proyecto.activado
@@ -287,7 +293,7 @@ export class ListarProyectosDirectorComponent implements OnInit {
       error: (err) => {
         this.guardando = false;
         this.errorModal =
-          err?.error?.message ?? 'No se pudo actualizar el proyecto. Inténtalo de nuevo.';
+          extraerMensajeError(err, 'No se pudo actualizar el proyecto. Inténtalo de nuevo.');
       }
     });
   }

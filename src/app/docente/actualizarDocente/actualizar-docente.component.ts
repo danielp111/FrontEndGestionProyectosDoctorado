@@ -8,6 +8,7 @@ import { GrupoDTOSalida } from '../modelos/grupo-dto-salida';
 import { DocenteService } from '../servicios/docente.service';
 import { GrupoService } from '../servicios/grupo.service';
 import { AuthService } from '../../auth/servicios/auth.service';
+import { extraerMensajeError } from '../../shared/utils/error.util';
 
 @Component({
   selector: 'app-actualizar-docente',
@@ -120,13 +121,20 @@ export class ActualizarDocenteComponent implements OnInit {
       next: () => {
         this.enviando = false;
         this.mensajeExito = 'Docente actualizado correctamente.';
+        this.irArriba();
       },
       error: (err) => {
         this.enviando = false;
         this.mensajeError =
-          err.error.message, 'No se pudo actualizar el docente. Inténtalo de nuevo  .';
+          extraerMensajeError(err, 'No se pudo actualizar el docente. Inténtalo de nuevo.');
+        this.irArriba();
       }
     });
+  }
+
+  // Los mensajes de éxito y error se muestran sobre el formulario
+  private irArriba(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   volver(): void {

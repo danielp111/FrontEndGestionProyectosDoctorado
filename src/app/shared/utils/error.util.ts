@@ -1,7 +1,7 @@
 /**
  * Extrae el mensaje legible de un error HTTP de Spring Boot.
- * Cubre los formatos más comunes: campo `message`, lista de `errors` de @Valid,
- * campo `error` y cadena plana.
+ * Cubre los formatos más comunes: campo `mensaje`/`message`, lista de `errors` de @Valid,
+ * campo `error`, mapa { campo: mensaje } y cadena plana.
  */
 export function extraerMensajeError(err: any, fallback = 'Ocurrió un error. Inténtalo de nuevo.'): string {
   const body = err?.error;
@@ -19,6 +19,10 @@ export function extraerMensajeError(err: any, fallback = 'Ocurrió un error. Int
   }
 
   if (body.error) return body.error;
+
+  // Mapa { campo: mensaje } que devuelve el handler de MethodArgumentNotValidException
+  const mensajesCampo = Object.values(body).filter((v): v is string => typeof v === 'string');
+  if (mensajesCampo.length > 0) return mensajesCampo.join(' | ');
 
   return fallback;
 }

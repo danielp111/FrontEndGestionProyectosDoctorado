@@ -10,3 +10,802 @@ app-root {
   flex-direction: column;
   min-height: 100%;
 }
+
+/* Modal "Detalle del proyecto" (filtro general y lista del director) */
+.pd-modal {
+  --pd-ink: #111827;
+  --pd-muted: #6b7280;
+  --pd-line: #e5e7eb;
+  --pd-surface: #f9fafb;
+  border: none;
+  border-radius: 1rem;
+  overflow: hidden;
+  color: var(--pd-ink);
+  box-shadow: 0 24px 64px -16px rgba(17, 24, 39, 0.35);
+}
+
+.pd-header {
+  padding: 1.5rem 1.75rem 1.25rem;
+  border-bottom: 1px solid var(--pd-line);
+}
+
+.pd-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.pd-eyebrow,
+.pd-meta dt,
+.pd-section-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pd-muted);
+}
+
+.pd-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.pd-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  color: var(--pd-muted);
+}
+
+.pd-status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: #9ca3af;
+}
+
+.pd-status--activo {
+  color: var(--pd-ink);
+}
+
+.pd-status--activo .pd-status-dot {
+  background: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+
+.pd-body {
+  padding: 1.5rem 1.75rem;
+}
+
+/* Cuadrícula de datos: el gap de 1px deja ver el fondo como líneas divisorias */
+.pd-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0 0 1.75rem;
+  background: var(--pd-line);
+  border: 1px solid var(--pd-line);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.pd-meta-item {
+  min-width: 0;
+  padding: 0.9rem 1rem;
+  background: #fff;
+}
+
+.pd-meta-item:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.pd-meta dt {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.3rem;
+}
+
+.pd-meta dd {
+  margin: 0;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.pd-modal a {
+  color: var(--pd-ink);
+  text-decoration: underline;
+  text-decoration-color: #d1d5db;
+  text-underline-offset: 3px;
+}
+
+.pd-modal a:hover {
+  text-decoration-color: currentColor;
+}
+
+.pd-section + .pd-section {
+  margin-top: 1.5rem;
+}
+
+.pd-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.pd-section-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--pd-line);
+}
+
+.pd-text {
+  margin: 0;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.pd-contact {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+  padding: 1rem 1.1rem;
+  font-size: 0.9rem;
+  color: #374151;
+  background: var(--pd-surface);
+  border: 1px solid var(--pd-line);
+  border-radius: 0.75rem;
+}
+
+.pd-contact i {
+  font-size: 1.1rem;
+  color: var(--pd-muted);
+}
+
+.pd-contact p {
+  text-align: justify;
+  overflow-wrap: anywhere;
+}
+
+.pd-footer {
+  padding: 1rem 1.75rem;
+  border-top: 1px solid var(--pd-line);
+}
+
+.pd-btn {
+  padding: 0.45rem 1.4rem;
+  border-radius: 999px;
+}
+
+@media (max-width: 575.98px) {
+  .pd-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .pd-header,
+  .pd-body,
+  .pd-footer {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+}
+
+/* Tabla de proyectos (mismo lenguaje visual que los modales pd-) */
+.pt-card {
+  --pt-ink: #111827;
+  --pt-muted: #6b7280;
+  --pt-line: #e5e7eb;
+  --pt-surface: #f9fafb;
+  background: #fff;
+  border: 1px solid var(--pt-line);
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 8px 24px -12px rgba(17, 24, 39, 0.18);
+  color: var(--pt-ink);
+}
+
+.pt-table {
+  --bs-table-bg: transparent;
+  --bs-table-hover-bg: var(--pt-surface);
+  color: var(--pt-ink);
+}
+
+.pt-table > thead > tr > th {
+  padding: 0.85rem 1rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pt-muted);
+  white-space: nowrap;
+  border-bottom: 1px solid var(--pt-line);
+}
+
+.pt-table > tbody > tr > td {
+  padding: 0.95rem 1rem;
+  border-bottom: 1px solid var(--pt-line);
+}
+
+.pt-table > tbody > tr:last-child > td {
+  border-bottom: none;
+}
+
+.pt-table > tbody > tr {
+  transition: background-color 0.15s ease;
+}
+
+.pt-table > tbody > tr:hover > td {
+  background: var(--pt-surface);
+}
+
+.pt-title {
+  font-weight: 600;
+}
+
+.pt-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-left: 0.25rem;
+  padding: 0;
+  color: var(--pt-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.pt-action:hover:not(:disabled),
+.pt-action:focus-visible {
+  color: var(--pt-ink);
+  background: #fff;
+  border-color: var(--pt-line);
+}
+
+.pt-action:focus-visible {
+  outline: 2px solid var(--pt-ink);
+  outline-offset: 2px;
+}
+
+.pt-action:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.pt-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-top: 1px solid var(--pt-line);
+}
+
+.pt-count {
+  font-size: 0.85rem;
+  color: var(--pt-muted);
+}
+
+.pt-pagination {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pt-pagination button {
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.6rem;
+  font-size: 0.85rem;
+  color: var(--pt-ink);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.pt-pagination button:hover:not(:disabled):not(.active) {
+  border-color: var(--pt-line);
+}
+
+.pt-pagination button.active {
+  color: #fff;
+  background: var(--pt-ink);
+}
+
+.pt-pagination button:disabled {
+  color: var(--pt-muted);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Barra de filtros compacta de la vista pública (usa las variables de .pt-card) */
+.pf-bar {
+  padding: 0.9rem 1rem;
+}
+
+.pf-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.pf-field {
+  min-width: 0;
+}
+
+.pf-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pt-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pf-control {
+  height: 2.25rem;
+  font-size: 0.9rem;
+  border-color: var(--pt-line);
+  border-radius: 0.6rem;
+}
+
+.pf-control:focus {
+  border-color: var(--pt-ink);
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+}
+
+.pf-input-wrap {
+  position: relative;
+}
+
+.pf-input-icon,
+.pf-counter {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--pt-muted);
+  pointer-events: none;
+}
+
+.pf-input-icon {
+  left: 0.75rem;
+  font-size: 0.85rem;
+}
+
+/* El contador va dentro del campo para no sumar altura */
+.pf-counter {
+  right: 0.75rem;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.pf-control--icon {
+  padding-left: 2.1rem;
+}
+
+.pf-control--counter {
+  padding-right: 3.6rem;
+}
+
+.pf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.pf-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 2rem;
+  padding: 0 0.85rem;
+  font-size: 0.85rem;
+  color: var(--pt-ink);
+  background: transparent;
+  border: 1px solid var(--pt-line);
+  border-radius: 999px;
+  transition: background-color 0.15s ease;
+}
+
+.pf-toggle:hover {
+  background: var(--pt-surface);
+}
+
+.pf-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  padding: 0 0.3rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--pt-ink);
+  border-radius: 999px;
+}
+
+.pf-chips {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pf-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  max-width: 16rem;
+  height: 1.75rem;
+  padding: 0 0.2rem 0 0.7rem;
+  font-size: 0.8rem;
+  background: var(--pt-surface);
+  border: 1px solid var(--pt-line);
+  border-radius: 999px;
+}
+
+.pf-chip-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pf-chip button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.3rem;
+  height: 1.3rem;
+  padding: 0;
+  color: var(--pt-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+}
+
+.pf-chip button:hover,
+.pf-chip button:focus-visible {
+  color: var(--pt-ink);
+  background: var(--pt-line);
+}
+
+.pf-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.pf-clear {
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  color: var(--pt-muted);
+  background: transparent;
+  border: 0;
+}
+
+.pf-clear:hover {
+  color: var(--pt-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.pf-submit {
+  display: inline-flex;
+  align-items: center;
+  height: 2rem;
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 0.875rem;
+}
+
+.pf-more {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--pt-line);
+}
+
+@media (max-width: 991.98px) {
+  .pf-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pf-field--search {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .pf-grid,
+  .pf-more {
+    grid-template-columns: 1fr;
+  }
+
+  .pf-buttons {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+/* Formulario de registro de proyecto (sobre .pt-card) */
+.rf-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.rf-title {
+  margin: 0.15rem 0 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #111827;
+}
+
+.rf-body {
+  padding: 1.5rem 1.75rem;
+}
+
+.rf-label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.rf-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pt-muted);
+}
+
+.rf-required {
+  color: #dc2626;
+}
+
+.rf-counter {
+  font-size: 0.75rem;
+  color: var(--pt-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.rf-form .form-control,
+.rf-form .form-select {
+  font-size: 0.95rem;
+  border-color: var(--pt-line);
+  border-radius: 0.6rem;
+}
+
+.rf-form .form-control:focus,
+.rf-form .form-select:focus {
+  border-color: var(--pt-ink);
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+}
+
+.rf-form textarea.form-control {
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.rf-form .form-control.is-invalid,
+.rf-form .form-select.is-invalid {
+  border-color: #dc2626;
+}
+
+.rf-form .form-control.is-invalid:focus,
+.rf-form .form-select.is-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+.rf-readonly {
+  color: var(--pt-ink);
+  background: var(--pt-surface);
+  cursor: default;
+}
+
+.rf-help {
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--pt-muted);
+}
+
+.rf-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.4rem;
+  margin: 0;
+  padding-left: 0;
+}
+
+.rf-switch .form-check-input {
+  float: none;
+  margin: 0;
+  width: 2.5rem;
+  height: 1.35rem;
+  cursor: pointer;
+}
+
+.rf-switch .form-check-input:checked {
+  background-color: var(--pt-ink);
+  border-color: var(--pt-ink);
+}
+
+.rf-switch .form-check-input:focus {
+  border-color: var(--pt-ink);
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.12);
+}
+
+.rf-footer {
+  padding: 1rem 1.75rem;
+}
+
+.rf-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding: 0.8rem 1rem;
+  font-size: 0.9rem;
+  border: 1px solid;
+  border-radius: 0.75rem;
+}
+
+.rf-alert--exito {
+  color: #166534;
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.rf-alert--error {
+  color: #991b1b;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+@media (max-width: 575.98px) {
+  .rf-body,
+  .rf-footer {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+}
+
+/* Lista de proyectos del director */
+.rf-subtitle {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  color: var(--pd-muted, #6b7280);
+}
+
+.pf-grid--director,
+.pf-grid--compacta {
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr)) auto;
+}
+
+.pf-field--accion {
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 0.3rem;
+}
+
+.pf-clear:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.pt-action--peligro:hover:not(:disabled),
+.pt-action--peligro:focus-visible {
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.pt-switch {
+  min-height: 0;
+}
+
+.pt-switch .form-check-label {
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.pt-switch-label--inactivo {
+  color: var(--pt-muted);
+}
+
+.pt-empty {
+  padding: 2rem 1rem !important;
+  text-align: center;
+  color: var(--pt-muted);
+}
+
+@media (max-width: 991.98px) {
+  .pf-grid--director,
+  .pf-grid--compacta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pf-field--accion {
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .pf-grid--director,
+  .pf-grid--compacta {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Los formularios rf- dentro de un modal pd- usan las mismas variables que .pt-card */
+.pd-modal {
+  --pt-ink: var(--pd-ink);
+  --pt-muted: var(--pd-muted);
+  --pt-line: var(--pd-line);
+  --pt-surface: var(--pd-surface);
+}
+
+/* Modal con <form> envolviendo header/body/footer: el form toma el layout flexible
+   de .modal-content para que en .modal-dialog-scrollable solo se desplace el cuerpo
+   y el pie no quede recortado */
+.pd-modal-form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 100%;
+}
+
+.pd-modal-form > .modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Celdas secundarias de tablas pt- */
+.pt-id {
+  font-size: 0.8rem;
+  color: var(--pt-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.pt-muted-cell {
+  color: var(--pt-muted);
+}

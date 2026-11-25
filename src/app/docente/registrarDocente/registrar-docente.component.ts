@@ -75,12 +75,19 @@ export class RegistrarDocenteComponent implements OnInit {
         this.enviando = false;
         this.mensajeExito = 'Docente registrado correctamente.';
         this.form.reset();
+        this.irArriba();
       },
       error: (err) => {
         this.enviando = false;
 
         this.mensajeError = extraerMensajeError(err, 'No se pudo registrar el docente. Inténtalo de nuevo.');
+        this.irArriba();
       }
     });
+  }
+
+  // Los mensajes de éxito y error se muestran sobre el formulario
+  private irArriba(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }

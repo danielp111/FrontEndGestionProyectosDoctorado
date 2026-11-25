@@ -1,4 +1,5 @@
 import { LineaInvestigacionDTOSalida } from './linea-investigacion-dto-salida';
+import { TipoProyectoDTOSalida } from './tipo-proyecto-dto-salida';
 import { DocenteDTOSalida } from '../../docente/modelos/docente-dto-salida';
 
 export interface ProyectoDTOResultado {
@@ -6,7 +7,7 @@ export interface ProyectoDTOResultado {
   titulo: string;
   resumen: string;
   objetivos: string;
-  tipoProyecto: string;
+  tipoProyecto: TipoProyectoDTOSalida;
   lineaInvestigacion: LineaInvestigacionDTOSalida;
   director: DocenteDTOSalida;
   activado: boolean;
